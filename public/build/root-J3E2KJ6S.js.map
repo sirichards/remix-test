@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["browser-route-module:/Users/s.richards/Documents/GitHub/remix-test/app/root.jsx?browser", "../../app/root.jsx"],
+  "sourcesContent": ["export { default, links, meta } from \"/Users/s.richards/Documents/GitHub/remix-test/app/root.jsx\";", "import {\n  Links,\n  LiveReload,\n  Meta,\n  Outlet,\n  Scripts,\n  ScrollRestoration,\n} from \"@remix-run/react\";\n\n// import globalStyles from '~/styles/global.css';\nimport styles from \"./tailwind.css\";\n\nexport const links = () => [\n  { rel: \"stylesheet\", href: styles },\n];\n\nexport const meta = () => ({\n  charset: \"utf-8\",\n  refresh: {\n    httpEquiv: \"x-ua-compatible\",\n    content: \"ie=edge\"\n  },\n  viewport: \"width=device-width,initial-scale=1\",\n  title: \"Default title here\",\n  description: \"Default description here\"\n});\n\nexport default function App() {\n  return (\n    <html lang=\"en\">\n      <head>\n        <Meta />\n        <Links />\n      </head>\n      <body>\n        <Outlet />\n        <ScrollRestoration />\n        <Scripts />\n        <LiveReload />\n      </body>\n    </html>\n  );\n}"],
+  "mappings": ";;;;;;;;;;;;AAAA;;;ACAA;;;;;;AAYO,IAAM,QAAQ,MAAM;AAAA,EACzB,EAAE,KAAK,cAAc,MAAM;AAAA;AAGtB,IAAM,OAAO,MAAO;AAAA,EACzB,SAAS;AAAA,EACT,SAAS;AAAA,IACP,WAAW;AAAA,IACX,SAAS;AAAA;AAAA,EAEX,UAAU;AAAA,EACV,OAAO;AAAA,EACP,aAAa;AAAA;AAGA,eAAe;AAC5B,SACE,oCAAC,QAAD;AAAA,IAAM,MAAK;AAAA,KACT,oCAAC,QAAD,MACE,oCAAC,MAAD,OACA,oCAAC,OAAD,QAEF,oCAAC,QAAD,MACE,oCAAC,QAAD,OACA,oCAAC,mBAAD,OACA,oCAAC,SAAD,OACA,oCAAC,YAAD;AAAA;",
+  "names": []
+}

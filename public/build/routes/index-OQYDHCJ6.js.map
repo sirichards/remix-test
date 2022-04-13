@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["empty-module:~/models/frontpage.server", "browser-route-module:/Users/s.richards/Documents/GitHub/remix-test/app/routes/index.jsx?browser", "../../../app/routes/index.jsx"],
+  "sourcesContent": ["module.exports = {};", "export { default } from \"/Users/s.richards/Documents/GitHub/remix-test/app/routes/index.jsx\";", "import { useLoaderData } from \"@remix-run/react\"\nimport { getFrontPage } from \"~/models/frontpage.server\"\n// import { Seo } from \"~/utils/seo\"\nimport PageTemplate from \"~/components/templates/PageTemplate\"\n\n// export const meta = ({data}) => {\n//   return Seo(data)\n// };\n\n// Get front page data\nexport let loader = async () => {\n  return getFrontPage()\n}\n\nexport default function IndexPage() {\n  let page = useLoaderData()\n\n  return <PageTemplate data={page} />\n}"],
+  "mappings": ";;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA,WAAO,UAAU;AAAA;AAAA;;;ACAjB;;;ACAA;AACA,uBAA6B;AAad,qBAAqB;AAClC,MAAI,OAAO;AAEX,SAAO,oCAAC,MAAD;AAAA,IAAc,MAAM;AAAA;AAAA;",
+  "names": []
+}
