@@ -1,3 +1,5 @@
+import defaults from "~/config.json"
+
 export function Seo(data) {
   const {
     title, 
@@ -8,19 +10,22 @@ export function Seo(data) {
     canonical
   } = data
 
+  const metaTitle = title || defaults.title
+  const metaDescription = metaDesc || defaults.description
+
   return {
-    title: title,
-    description: metaDesc,
+    title: metaTitle,
+    description: metaDescription,
     keywords: metaKeywords,
     // "og:image": "https://remix-jokes.lol/social.png",
-    "og:title": title,
-    "og:description": metaDesc,
+    "og:title": metaTitle,
+    "og:description": metaDescription,
     "og:url": canonical,
     "og:type": "website",
     // "twitter:image": "https://remix-jokes.lol/social.png",
     "twitter:card": "summary",
     "twitter:creator": "Dewynters",
-    "twitter:title": title,
-    "twitter:description": metaDesc,
+    "twitter:title": metaTitle,
+    "twitter:description": metaDescription,
   };
 }

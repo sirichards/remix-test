@@ -6,14 +6,19 @@ import {
   Scripts,
   ScrollRestoration,
   useMatches,
+  useLoaderData
 } from "@remix-run/react";
 
 // import globalStyles from '~/styles/global.css';
-import styles from "./tailwind.css";
+import tailwindStyles from "./tailwind.css";
+import defaults from "./config.json"
 
 export const links = () => [
-  { rel: "stylesheet", href: styles },
-];
+  { rel: "stylesheet", href: tailwindStyles },
+  { rel: 'manifest', href: '/site.webmanifest' },
+  { rel: 'icon', href: '/favicon.ico' },
+  { rel: 'sitemap', href: '/sitemap.xml', type: 'application/xml' },
+]
 
 export const meta = () => ({
   charset: "utf-8",
@@ -21,16 +26,22 @@ export const meta = () => ({
     httpEquiv: "x-ua-compatible",
     content: "ie=edge"
   },
-  viewport: "width=device-width,initial-scale=1",
-  title: "Default title here",
-  description: "Default description here"
-});
+  viewport: "width=device-width, initial-scale=1, shrink-to-fit=no"
+})
+
+export const loader = async ({request}) => {
+  let canonical = new URL(request.url).href
+  // force trailing slash
+  if (!canonical.includes("?")) {
+    if (canonical.substr(-1) !== '/') canonical = canonical + "/" 
+  }
+
+  return canonical
+}
 
 export default function App() {
   // finds and pulls data from current route file export
-  const matches = useMatches();
-  const match = matches.find((match) => match.data && match.data.canonical);
-  const canonical = match?.data.canonical;
+  const canonical = useLoaderData()
 
   return (
     <html lang="en">

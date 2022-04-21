@@ -13,10 +13,9 @@ export const loader = async ({request}) => {
   const url = new URL(request.url);
   const pageId = url.searchParams.get("page_id")
   const secret = url.searchParams.get("secret")
-  const canonical = `${process.env.FRONTEND_URL}`
 
   const page = await getPreviewPage(pageId, secret)
-  return json({page, canonical})
+  return json({page})
 }
 
 export default function Preview() {

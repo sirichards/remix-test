@@ -11,9 +11,8 @@ export const meta = ({data}) => {
 // Get page by path
 export const loader = async ({params}) => {
   const { menu, page } = await getPage(params["*"])
-  const canonical = `${process.env.FRONTEND_URL}${page.uri}`
 
-  return json({page, menu, canonical})
+  return json({page, menu})
 }
 
 export default function Page() {

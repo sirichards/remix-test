@@ -20,8 +20,8 @@ var __spreadValues = (a, b) => {
 };
 var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name2 in all)
+    __defProp(target, name2, { get: all[name2], enumerable: true });
 };
 var __reExport = (target, module2, copyDefault, desc) => {
   if (module2 && typeof module2 === "object" || typeof module2 === "function") {
@@ -75,16 +75,53 @@ var root_exports = {};
 __export(root_exports, {
   default: () => App,
   links: () => links,
+  loader: () => loader,
   meta: () => meta
 });
 var import_react2 = require("@remix-run/react");
 
 // app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-QJBQBVSH.css";
+var tailwind_default = "/build/_assets/tailwind-6ETONH67.css";
+
+// app/config.json
+var title = "Hello world";
+var description = "This is a description";
+var author = "Dewynters - Simon Richards";
+var url = "https://domain.coms";
+var name = "Dewynters";
+var short_name = "Dewynters";
+var icons = [
+  {
+    src: "/favicons/android-chrome-192x192.png",
+    sizes: "192x192",
+    type: "image/png"
+  },
+  {
+    src: "/favicons/android-chrome-512x512.png",
+    sizes: "512x512",
+    type: "image/png"
+  }
+];
+var theme_color = "#A9ADC1";
+var background_color = "#1f2028";
+var config_default = {
+  title,
+  description,
+  author,
+  url,
+  name,
+  short_name,
+  icons,
+  theme_color,
+  background_color
+};
 
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/root.jsx
 var links = () => [
-  { rel: "stylesheet", href: tailwind_default }
+  { rel: "stylesheet", href: tailwind_default },
+  { rel: "manifest", href: "/site.webmanifest" },
+  { rel: "icon", href: "/favicon.ico" },
+  { rel: "sitemap", href: "/sitemap.xml", type: "application/xml" }
 ];
 var meta = () => ({
   charset: "utf-8",
@@ -92,14 +129,18 @@ var meta = () => ({
     httpEquiv: "x-ua-compatible",
     content: "ie=edge"
   },
-  viewport: "width=device-width,initial-scale=1",
-  title: "Default title here",
-  description: "Default description here"
+  viewport: "width=device-width, initial-scale=1, shrink-to-fit=no"
 });
+var loader = async ({ request }) => {
+  let canonical = new URL(request.url).href;
+  if (!canonical.includes("?")) {
+    if (canonical.substr(-1) !== "/")
+      canonical = canonical + "/";
+  }
+  return canonical;
+};
 function App() {
-  const matches = (0, import_react2.useMatches)();
-  const match = matches.find((match2) => match2.data && match2.data.canonical);
-  const canonical = match == null ? void 0 : match.data.canonical;
+  const canonical = (0, import_react2.useLoaderData)();
   return /* @__PURE__ */ React.createElement("html", {
     lang: "en"
   }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(import_react2.Meta, null), !!canonical && /* @__PURE__ */ React.createElement("link", {
@@ -108,10 +149,44 @@ function App() {
   }), /* @__PURE__ */ React.createElement(import_react2.Links, null)), /* @__PURE__ */ React.createElement("body", null, /* @__PURE__ */ React.createElement(import_react2.Outlet, null), /* @__PURE__ */ React.createElement(import_react2.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react2.Scripts, null), /* @__PURE__ */ React.createElement(import_react2.LiveReload, null)));
 }
 
+// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/site[.webmanifest].jsx
+var site_webmanifest_exports = {};
+__export(site_webmanifest_exports, {
+  loader: () => loader2
+});
+async function loader2() {
+  const json5 = `
+  {
+    "name": "${config_default.name}",
+    "short_name": "${config_default.short_name}",
+    "icons": [
+      {
+        "src": "/favicons/android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/favicons/android-chrome-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "theme_color": "${config_default.theme_color}",
+    "background_color": "${config_default.background_color}",
+    "display": "standalone"
+  }`;
+  return new Response(json5, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/sitemap[.xml].jsx
 var sitemap_xml_exports = {};
 __export(sitemap_xml_exports, {
-  loader: () => loader
+  loader: () => loader3
 });
 
 // app/models/pages.server.js
@@ -154,7 +229,7 @@ async function getPages() {
 }
 
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/sitemap[.xml].jsx
-async function loader() {
+async function loader3() {
   const { pages } = await getPages();
   function getEntry(node) {
     return `
@@ -182,15 +257,36 @@ async function loader() {
   });
 }
 
+// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/robots[.txt].jsx
+var robots_txt_exports = {};
+__export(robots_txt_exports, {
+  loader: () => loader4
+});
+async function loader4() {
+  const live = false;
+  const text = `
+User-agent: *
+${live ? "Allow: /" : "Disallow: /"}
+Sitemap: ${process.env.FRONTEND_URL}/sitemap.xml
+Host: ${process.env.FRONTEND_URL}
+  `.trim();
+  return new Response(text, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/plain"
+    }
+  });
+}
+
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/preview.jsx
 var preview_exports = {};
 __export(preview_exports, {
   default: () => Preview,
-  loader: () => loader2,
+  loader: () => loader5,
   meta: () => meta2
 });
 var import_node2 = require("@remix-run/node");
-var import_react4 = require("@remix-run/react");
+var import_react5 = require("@remix-run/react");
 
 // app/models/preview.server.js
 var import_node = require("@remix-run/node");
@@ -282,27 +378,32 @@ async function getPreviewPage(pageId, secret) {
 // app/utils/seo.js
 function Seo(data) {
   const {
-    title,
+    title: title2,
     metaDesc,
     metaKeywords
   } = data.page.seo;
   const {
     canonical
   } = data;
+  const metaTitle = title2 || config_default.title;
+  const metaDescription = metaDesc || config_default.description;
   return {
-    title,
-    description: metaDesc,
+    title: metaTitle,
+    description: metaDescription,
     keywords: metaKeywords,
-    "og:title": title,
-    "og:description": metaDesc,
+    "og:title": metaTitle,
+    "og:description": metaDescription,
     "og:url": canonical,
     "og:type": "website",
     "twitter:card": "summary",
     "twitter:creator": "Dewynters",
-    "twitter:title": title,
-    "twitter:description": metaDesc
+    "twitter:title": metaTitle,
+    "twitter:description": metaDescription
   };
 }
+
+// app/components/Header/Header.jsx
+var import_react4 = require("@remix-run/react");
 
 // app/components/Navigation/Navigation.jsx
 var import_prop_types = __toESM(require("prop-types"));
@@ -365,8 +466,10 @@ Navigation.propTypes = {
 function Header(props) {
   const menu = formatHeirarchialMenu(props.menu.menuItems.nodes);
   return /* @__PURE__ */ React.createElement("header", {
-    className: "p-6 bg-slate-100"
-  }, /* @__PURE__ */ React.createElement(Navigation, {
+    className: "p-6 bg-slate-100 flex justify-between items-center"
+  }, /* @__PURE__ */ React.createElement(import_react4.Link, {
+    to: "/"
+  }, "Remix template"), /* @__PURE__ */ React.createElement(Navigation, {
     menu
   }));
 }
@@ -388,7 +491,7 @@ function Layout({ menu, children }) {
 // app/components/FlexibleContent/blocks/Hero.jsx
 var Hero = (props) => {
   const {
-    title,
+    title: title2,
     desktopImage
   } = props.data;
   return /* @__PURE__ */ React.createElement("div", {
@@ -452,16 +555,15 @@ function Page({ data }) {
 var meta2 = ({ data }) => {
   return Seo(data);
 };
-var loader2 = async ({ request }) => {
-  const url = new URL(request.url);
-  const pageId = url.searchParams.get("page_id");
-  const secret = url.searchParams.get("secret");
-  const canonical = `${process.env.FRONTEND_URL}`;
+var loader5 = async ({ request }) => {
+  const url2 = new URL(request.url);
+  const pageId = url2.searchParams.get("page_id");
+  const secret = url2.searchParams.get("secret");
   const page = await getPreviewPage(pageId, secret);
-  return (0, import_node2.json)({ page, canonical });
+  return (0, import_node2.json)({ page });
 };
 function Preview() {
-  const { page } = (0, import_react4.useLoaderData)();
+  const { page } = (0, import_react5.useLoaderData)();
   return /* @__PURE__ */ React.createElement(Page, {
     data: page
   });
@@ -471,11 +573,11 @@ function Preview() {
 var routes_exports = {};
 __export(routes_exports, {
   default: () => IndexPage,
-  loader: () => loader3,
+  loader: () => loader6,
   meta: () => meta3
 });
 var import_node3 = require("@remix-run/node");
-var import_react5 = require("@remix-run/react");
+var import_react6 = require("@remix-run/react");
 
 // app/models/frontpage.server.js
 var import_graphql_request4 = require("graphql-request");
@@ -516,13 +618,12 @@ async function getFrontPage() {
 var meta3 = ({ data }) => {
   return Seo(data);
 };
-var loader3 = async () => {
+var loader6 = async () => {
   const { menu, pageBy } = await getFrontPage();
-  const canonical = `${process.env.FRONTEND_URL}`;
-  return (0, import_node3.json)({ page: pageBy, menu, canonical });
+  return (0, import_node3.json)({ page: pageBy, menu });
 };
 function IndexPage() {
-  let data = (0, import_react5.useLoaderData)();
+  let data = (0, import_react6.useLoaderData)();
   return /* @__PURE__ */ React.createElement(Page, {
     data
   });
@@ -532,11 +633,11 @@ function IndexPage() {
 var __exports = {};
 __export(__exports, {
   default: () => Page2,
-  loader: () => loader4,
+  loader: () => loader7,
   meta: () => meta4
 });
 var import_node4 = require("@remix-run/node");
-var import_react6 = require("@remix-run/react");
+var import_react7 = require("@remix-run/react");
 
 // app/models/page.server.js
 var import_graphql_request5 = require("graphql-request");
@@ -559,20 +660,19 @@ async function getPage(path) {
 var meta4 = ({ data }) => {
   return Seo(data);
 };
-var loader4 = async ({ params }) => {
+var loader7 = async ({ params }) => {
   const { menu, page } = await getPage(params["*"]);
-  const canonical = `${process.env.FRONTEND_URL}${page.uri}`;
-  return (0, import_node4.json)({ page, menu, canonical });
+  return (0, import_node4.json)({ page, menu });
 };
 function Page2() {
-  const data = (0, import_react6.useLoaderData)();
+  const data = (0, import_react7.useLoaderData)();
   return /* @__PURE__ */ React.createElement(Page, {
     data
   });
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { "version": "01463122", "entry": { "module": "/build/entry.client-XENUW6LL.js", "imports": ["/build/_shared/chunk-LLKHRCJG.js", "/build/_shared/chunk-6BO74FWO.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-HBYM4FTH.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/$": { "id": "routes/$", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/$-ZKPZ7OAC.js", "imports": ["/build/_shared/chunk-ANFM76ES.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/index": { "id": "routes/index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/index-G2IIVNDW.js", "imports": ["/build/_shared/chunk-ANFM76ES.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/preview": { "id": "routes/preview", "parentId": "root", "path": "preview", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/preview-RVXW27TD.js", "imports": ["/build/_shared/chunk-ANFM76ES.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/sitemap[.xml]": { "id": "routes/sitemap[.xml]", "parentId": "root", "path": "sitemap.xml", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/sitemap[.xml]-QCUKQTWZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-01463122.js" };
+var assets_manifest_default = { "version": "6d116b25", "entry": { "module": "/build/entry.client-BLNOZ625.js", "imports": ["/build/_shared/chunk-LZ6OABYT.js", "/build/_shared/chunk-6BO74FWO.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-HAQ2A4RI.js", "imports": ["/build/_shared/chunk-EFH6VQ2G.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/$": { "id": "routes/$", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/$-KGTFMXGK.js", "imports": ["/build/_shared/chunk-ZPCKTIIQ.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/index": { "id": "routes/index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/index-TFKGICVM.js", "imports": ["/build/_shared/chunk-ZPCKTIIQ.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/preview": { "id": "routes/preview", "parentId": "root", "path": "preview", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/preview-MRVKOYI5.js", "imports": ["/build/_shared/chunk-ZPCKTIIQ.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/robots[.txt]": { "id": "routes/robots[.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/robots[.txt]-D7H6MAQ2.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/site[.webmanifest]": { "id": "routes/site[.webmanifest]", "parentId": "root", "path": "site.webmanifest", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/site[.webmanifest]-IFWJPETA.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/sitemap[.xml]": { "id": "routes/sitemap[.xml]", "parentId": "root", "path": "sitemap.xml", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/sitemap[.xml]-QCUKQTWZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-6D116B25.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };
@@ -585,6 +685,14 @@ var routes = {
     caseSensitive: void 0,
     module: root_exports
   },
+  "routes/site[.webmanifest]": {
+    id: "routes/site[.webmanifest]",
+    parentId: "root",
+    path: "site.webmanifest",
+    index: void 0,
+    caseSensitive: void 0,
+    module: site_webmanifest_exports
+  },
   "routes/sitemap[.xml]": {
     id: "routes/sitemap[.xml]",
     parentId: "root",
@@ -592,6 +700,14 @@ var routes = {
     index: void 0,
     caseSensitive: void 0,
     module: sitemap_xml_exports
+  },
+  "routes/robots[.txt]": {
+    id: "routes/robots[.txt]",
+    parentId: "root",
+    path: "robots.txt",
+    index: void 0,
+    caseSensitive: void 0,
+    module: robots_txt_exports
   },
   "routes/preview": {
     id: "routes/preview",

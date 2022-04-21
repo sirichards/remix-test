@@ -11,9 +11,8 @@ export const meta = ({data}) => {
 // Get front page data
 export let loader = async () => {
   const { menu, pageBy } = await getFrontPage()
-  const canonical = `${process.env.FRONTEND_URL}`
 
-  return json({page: pageBy, menu, canonical})
+  return json({page: pageBy, menu})
 }
 
 export default function IndexPage() {
