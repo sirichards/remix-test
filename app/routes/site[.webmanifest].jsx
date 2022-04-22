@@ -1,25 +1,18 @@
 
 import defaults from "~/config.json"
 export async function loader() {
+  const { manifest } = defaults
   const json = `
   {
-    "name": "${defaults.name}",
-    "short_name": "${defaults.short_name}",
-    "icons": [
-      {
-        "src": "/favicons/android-chrome-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "/favicons/android-chrome-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ],
-    "theme_color": "${defaults.theme_color}",
-    "background_color": "${defaults.background_color}",
-    "display": "standalone"
+    "name": "${manifest.name}",
+    "short_name": "${manifest.short_name}",
+    "start_url": "/",
+    "icons": [${manifest.icons.map(icon => { 
+      return JSON.stringify(icon)
+    })}],
+    "theme_color": "${manifest.theme_color}",
+    "background_color": "${manifest.background_color}",
+    "display": "minimal-ui"
   }`
     
   return new Response(json, {

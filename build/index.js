@@ -20,8 +20,8 @@ var __spreadValues = (a, b) => {
 };
 var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __export = (target, all) => {
-  for (var name2 in all)
-    __defProp(target, name2, { get: all[name2], enumerable: true });
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __reExport = (target, module2, copyDefault, desc) => {
   if (module2 && typeof module2 === "object" || typeof module2 === "function") {
@@ -80,47 +80,76 @@ __export(root_exports, {
 });
 var import_react2 = require("@remix-run/react");
 
+// app/http.js
+var import_node = require("@remix-run/node");
+function addTrailingSlash(url2) {
+  if (url2.pathname !== "/" && !url2.pathname.endsWith("/") && !url2.pathname.includes(".") && !url2.pathname.includes("?")) {
+    throw (0, import_node.redirect)(`${url2.pathname}/`, {
+      status: 308
+    });
+  }
+}
+
 // app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-6ETONH67.css";
+var tailwind_default = "/build/_assets/tailwind-FOW2CCTG.css";
 
 // app/config.json
 var title = "Hello world";
 var description = "This is a description";
 var author = "Dewynters - Simon Richards";
 var url = "https://domain.coms";
-var name = "Dewynters";
-var short_name = "Dewynters";
-var icons = [
-  {
-    src: "/favicons/android-chrome-192x192.png",
-    sizes: "192x192",
-    type: "image/png"
-  },
-  {
-    src: "/favicons/android-chrome-512x512.png",
-    sizes: "512x512",
-    type: "image/png"
-  }
-];
-var theme_color = "#A9ADC1";
-var background_color = "#1f2028";
+var manifest = {
+  name: "Dewynters",
+  short_name: "Dewynters",
+  icons: [
+    {
+      src: "/android-chrome-192x192.png",
+      sizes: "192x192",
+      type: "image/png"
+    },
+    {
+      src: "/android-chrome-512x512.png",
+      sizes: "512x512",
+      type: "image/png"
+    }
+  ],
+  theme_color: "#A9ADC1",
+  background_color: "#1f2028"
+};
+var GTM_ID = "GTM-58C3HCB";
 var config_default = {
   title,
   description,
   author,
   url,
-  name,
-  short_name,
-  icons,
-  theme_color,
-  background_color
+  manifest,
+  GTM_ID
 };
 
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/root.jsx
+var import_react3 = require("react");
 var links = () => [
-  { rel: "stylesheet", href: tailwind_default },
+  {
+    rel: "apple-touch-icon",
+    sizes: "180x180",
+    href: "/apple-touch-icon.png"
+  },
+  {
+    rel: "icon",
+    type: "image/png",
+    sizes: "32x32",
+    href: "/favicon-32x32.png"
+  },
+  {
+    rel: "icon",
+    type: "image/png",
+    sizes: "16x16",
+    href: "/favicon-16x16.png"
+  },
   { rel: "manifest", href: "/site.webmanifest" },
+  { rel: "mask-icon", href: "/safari-pinned-tab.svg", color: "#000000" },
   { rel: "icon", href: "/favicon.ico" },
+  { rel: "stylesheet", href: tailwind_default },
   { rel: "sitemap", href: "/sitemap.xml", type: "application/xml" }
 ];
 var meta = () => ({
@@ -129,24 +158,39 @@ var meta = () => ({
     httpEquiv: "x-ua-compatible",
     content: "ie=edge"
   },
-  viewport: "width=device-width, initial-scale=1, shrink-to-fit=no"
+  viewport: "width=device-width, initial-scale=1, shrink-to-fit=no",
+  "msapplication-TileColor": "#000000",
+  "theme-color": "#ffffff"
 });
 var loader = async ({ request }) => {
-  let canonical = new URL(request.url).href;
-  if (!canonical.includes("?")) {
-    if (canonical.substr(-1) !== "/")
-      canonical = canonical + "/";
-  }
+  const url2 = new URL(request.url);
+  addTrailingSlash(url2);
+  let canonical = url2.href;
   return canonical;
 };
 function App() {
   const canonical = (0, import_react2.useLoaderData)();
+  (0, import_react3.useEffect)(() => {
+    if (config_default.GTM_ID) {
+      const postscribe = require("postscribe");
+      postscribe(document.head, `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','${config_default.GTM_ID}');<\/script>`);
+    }
+  });
   return /* @__PURE__ */ React.createElement("html", {
     lang: "en"
   }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(import_react2.Meta, null), !!canonical && /* @__PURE__ */ React.createElement("link", {
     rel: "canonical",
     href: canonical
-  }), /* @__PURE__ */ React.createElement(import_react2.Links, null)), /* @__PURE__ */ React.createElement("body", null, /* @__PURE__ */ React.createElement(import_react2.Outlet, null), /* @__PURE__ */ React.createElement(import_react2.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react2.Scripts, null), /* @__PURE__ */ React.createElement(import_react2.LiveReload, null)));
+  }), /* @__PURE__ */ React.createElement(import_react2.Links, null)), /* @__PURE__ */ React.createElement("body", null, config_default.GTM_ID && /* @__PURE__ */ React.createElement("noscript", null, /* @__PURE__ */ React.createElement("iframe", {
+    src: `https://www.googletagmanager.com/ns.html?id=${config_default.GTM_ID}`,
+    height: "0",
+    width: "0",
+    style: { display: "none", visibility: "hidden" }
+  })), /* @__PURE__ */ React.createElement(import_react2.Outlet, null), /* @__PURE__ */ React.createElement(import_react2.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react2.Scripts, null), /* @__PURE__ */ React.createElement(import_react2.LiveReload, null)));
 }
 
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/site[.webmanifest].jsx
@@ -155,25 +199,18 @@ __export(site_webmanifest_exports, {
   loader: () => loader2
 });
 async function loader2() {
+  const { manifest: manifest2 } = config_default;
   const json5 = `
   {
-    "name": "${config_default.name}",
-    "short_name": "${config_default.short_name}",
-    "icons": [
-      {
-        "src": "/favicons/android-chrome-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "/favicons/android-chrome-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ],
-    "theme_color": "${config_default.theme_color}",
-    "background_color": "${config_default.background_color}",
-    "display": "standalone"
+    "name": "${manifest2.name}",
+    "short_name": "${manifest2.short_name}",
+    "start_url": "/",
+    "icons": [${manifest2.icons.map((icon) => {
+    return JSON.stringify(icon);
+  })}],
+    "theme_color": "${manifest2.theme_color}",
+    "background_color": "${manifest2.background_color}",
+    "display": "minimal-ui"
   }`;
   return new Response(json5, {
     status: 200,
@@ -285,11 +322,11 @@ __export(preview_exports, {
   loader: () => loader5,
   meta: () => meta2
 });
-var import_node2 = require("@remix-run/node");
-var import_react5 = require("@remix-run/react");
+var import_node3 = require("@remix-run/node");
+var import_react6 = require("@remix-run/react");
 
 // app/models/preview.server.js
-var import_node = require("@remix-run/node");
+var import_node2 = require("@remix-run/node");
 var import_graphql_request3 = require("graphql-request");
 
 // app/utils/helpers.js
@@ -403,11 +440,11 @@ function Seo(data) {
 }
 
 // app/components/Header/Header.jsx
-var import_react4 = require("@remix-run/react");
+var import_react5 = require("@remix-run/react");
 
 // app/components/Navigation/Navigation.jsx
 var import_prop_types = __toESM(require("prop-types"));
-var import_react3 = require("@remix-run/react");
+var import_react4 = require("@remix-run/react");
 function Arrow() {
   return /* @__PURE__ */ React.createElement("span", {
     role: "button",
@@ -432,7 +469,7 @@ function NavigationMenu({ menu }) {
     const children = item.children && item.children.length > 0 ? item.children : "";
     return /* @__PURE__ */ React.createElement("li", {
       key: item.id
-    }, item.path.charAt(0) === "/" ? /* @__PURE__ */ React.createElement(import_react3.NavLink, {
+    }, item.path.charAt(0) === "/" ? /* @__PURE__ */ React.createElement(import_react4.NavLink, {
       to: item.path,
       target: item.target ? item.target : "_self",
       style: ({ isActive }) => isActive ? activeStyle : void 0,
@@ -467,7 +504,7 @@ function Header(props) {
   const menu = formatHeirarchialMenu(props.menu.menuItems.nodes);
   return /* @__PURE__ */ React.createElement("header", {
     className: "p-6 bg-slate-100 flex justify-between items-center"
-  }, /* @__PURE__ */ React.createElement(import_react4.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react5.Link, {
     to: "/"
   }, "Remix template"), /* @__PURE__ */ React.createElement(Navigation, {
     menu
@@ -560,10 +597,10 @@ var loader5 = async ({ request }) => {
   const pageId = url2.searchParams.get("page_id");
   const secret = url2.searchParams.get("secret");
   const page = await getPreviewPage(pageId, secret);
-  return (0, import_node2.json)({ page });
+  return (0, import_node3.json)({ page });
 };
 function Preview() {
-  const { page } = (0, import_react5.useLoaderData)();
+  const { page } = (0, import_react6.useLoaderData)();
   return /* @__PURE__ */ React.createElement(Page, {
     data: page
   });
@@ -576,8 +613,8 @@ __export(routes_exports, {
   loader: () => loader6,
   meta: () => meta3
 });
-var import_node3 = require("@remix-run/node");
-var import_react6 = require("@remix-run/react");
+var import_node4 = require("@remix-run/node");
+var import_react7 = require("@remix-run/react");
 
 // app/models/frontpage.server.js
 var import_graphql_request4 = require("graphql-request");
@@ -620,10 +657,10 @@ var meta3 = ({ data }) => {
 };
 var loader6 = async () => {
   const { menu, pageBy } = await getFrontPage();
-  return (0, import_node3.json)({ page: pageBy, menu });
+  return (0, import_node4.json)({ page: pageBy, menu });
 };
 function IndexPage() {
-  let data = (0, import_react6.useLoaderData)();
+  let data = (0, import_react7.useLoaderData)();
   return /* @__PURE__ */ React.createElement(Page, {
     data
   });
@@ -636,8 +673,8 @@ __export(__exports, {
   loader: () => loader7,
   meta: () => meta4
 });
-var import_node4 = require("@remix-run/node");
-var import_react7 = require("@remix-run/react");
+var import_node5 = require("@remix-run/node");
+var import_react8 = require("@remix-run/react");
 
 // app/models/page.server.js
 var import_graphql_request5 = require("graphql-request");
@@ -662,17 +699,17 @@ var meta4 = ({ data }) => {
 };
 var loader7 = async ({ params }) => {
   const { menu, page } = await getPage(params["*"]);
-  return (0, import_node4.json)({ page, menu });
+  return (0, import_node5.json)({ page, menu });
 };
 function Page2() {
-  const data = (0, import_react7.useLoaderData)();
+  const data = (0, import_react8.useLoaderData)();
   return /* @__PURE__ */ React.createElement(Page, {
     data
   });
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { "version": "d0e8075f", "entry": { "module": "/build/entry.client-HEMPJ4A3.js", "imports": ["/build/_shared/chunk-FZ5G3KU3.js", "/build/_shared/chunk-6BO74FWO.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-GYVXXMSQ.js", "imports": ["/build/_shared/chunk-EFH6VQ2G.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/$": { "id": "routes/$", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/$-5SQNCJX7.js", "imports": ["/build/_shared/chunk-EVIFTKSX.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/index": { "id": "routes/index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/index-XGPGF37S.js", "imports": ["/build/_shared/chunk-EVIFTKSX.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/preview": { "id": "routes/preview", "parentId": "root", "path": "preview", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/preview-Z6LNSSG5.js", "imports": ["/build/_shared/chunk-EVIFTKSX.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/robots[.txt]": { "id": "routes/robots[.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/robots[.txt]-D7H6MAQ2.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/site[.webmanifest]": { "id": "routes/site[.webmanifest]", "parentId": "root", "path": "site.webmanifest", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/site[.webmanifest]-IFWJPETA.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/sitemap[.xml]": { "id": "routes/sitemap[.xml]", "parentId": "root", "path": "sitemap.xml", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/sitemap[.xml]-QCUKQTWZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-D0E8075F.js" };
+var assets_manifest_default = { "version": "e37dd0b0", "entry": { "module": "/build/entry.client-7BC7MIEH.js", "imports": ["/build/_shared/chunk-L7SIPBTJ.js", "/build/_shared/chunk-6BO74FWO.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-5CMJPACA.js", "imports": ["/build/_shared/chunk-P652U4IZ.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/$": { "id": "routes/$", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/$-5CMIERCD.js", "imports": ["/build/_shared/chunk-2QGXMX5R.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/index": { "id": "routes/index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/index-JWCT7PJY.js", "imports": ["/build/_shared/chunk-2QGXMX5R.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/preview": { "id": "routes/preview", "parentId": "root", "path": "preview", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/preview-2KONPKEM.js", "imports": ["/build/_shared/chunk-2QGXMX5R.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/robots[.txt]": { "id": "routes/robots[.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/robots[.txt]-D7H6MAQ2.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/site[.webmanifest]": { "id": "routes/site[.webmanifest]", "parentId": "root", "path": "site.webmanifest", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/site[.webmanifest]-IFWJPETA.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/sitemap[.xml]": { "id": "routes/sitemap[.xml]", "parentId": "root", "path": "sitemap.xml", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/sitemap[.xml]-QCUKQTWZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-E37DD0B0.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };
