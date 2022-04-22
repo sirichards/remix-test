@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["empty-module:~/models/preview.server", "browser-route-module:/Users/s.richards/Documents/GitHub/remix-test/app/routes/preview.jsx?browser", "../../../app/routes/preview.jsx"],
-  "sourcesContent": ["module.exports = {};", "export { default, meta } from \"/Users/s.richards/Documents/GitHub/remix-test/app/routes/preview.jsx\";", "import { useLoaderData } from \"@remix-run/react\"\nimport { getPreviewPage } from \"~/models/preview.server\"\nimport { Seo } from \"~/utils/seo\"\nimport PageTemplate from \"~/components/templates/PageTemplate\"\n\nexport const meta = ({data}) => {\n  return Seo(data)\n};\n\n// Get page by path\nexport const loader = async ({request}) => {\n  const url = new URL(request.url);\n  const pageId = url.searchParams.get(\"page_id\")\n  const secret = url.searchParams.get(\"secret\")\n\n  const page = await getPreviewPage(pageId, secret)\n  return json({page, canonical})\n}\n\nexport default function Preview() {\n  const page = useLoaderData()\n\n  return <PageTemplate data={page} />\n}"],
-  "mappings": ";;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA,WAAO,UAAU;AAAA;AAAA;;;ACAjB;;;ACAA;AACA,qBAA+B;AAIxB,IAAM,OAAO,CAAC,EAAC,WAAU;AAC9B,SAAO,IAAI;AAAA;AAaE,mBAAmB;AAChC,QAAM,OAAO;AAEb,SAAO,oCAAC,MAAD;AAAA,IAAc,MAAM;AAAA;AAAA;",
-  "names": []
-}

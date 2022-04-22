@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["empty-module:~/models/page.server", "browser-route-module:/Users/s.richards/Documents/GitHub/remix-test/app/routes/$.jsx?browser", "../../../app/routes/$.jsx"],
-  "sourcesContent": ["module.exports = {};", "export { default } from \"/Users/s.richards/Documents/GitHub/remix-test/app/routes/$.jsx\";", "import { useLoaderData } from \"@remix-run/react\"\nimport { getPage } from \"~/models/page.server\"\n// import { Seo } from \"~/utils/seo\"\n// import PageTemplate from \"~/components/templates/PageTemplate\"\n\n// export const meta = ({data}) => {\n//   return Seo(data)\n// };\n\n// Get page by path\nexport function loader({ params }) {\n  const page = getPage(params[\"*\"])\n  console.log(page)\n  // const canonical = `${process.env.FRONTEND_URL}/${page?.uri}`\n\n  // return { page: page, canonical }\n  // return getPage(params[\"*\"])\n  // return { page }\n  return page\n}\n\nexport default function Page() {\n  const page = useLoaderData()\n  console.log(page)\n  return \"Hello\"\n  // return <PageTemplate data={page} />\n}"],
-  "mappings": ";;;;;;;;AAAA;AAAA;AAAA;AAAA,WAAO,UAAU;AAAA;AAAA;;;ACAjB;;;ACAA;AACA,kBAAwB;AAoBT,gBAAgB;AAC7B,QAAM,OAAO;AACb,UAAQ,IAAI;AACZ,SAAO;AAAA;",
-  "names": []
-}
