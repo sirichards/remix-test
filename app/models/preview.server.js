@@ -1,4 +1,4 @@
-import { json } from "@remix-run/node"
+import { json } from "@remix-run/cloudflare"
 import { gql } from "graphql-request"
 import { error404, error401 } from "~/utils/helpers"
 import { createNewClient } from "~/client.server"

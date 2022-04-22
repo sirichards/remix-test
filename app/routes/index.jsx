@@ -1,4 +1,4 @@
-import { json } from "@remix-run/node"
+import { json } from "@remix-run/cloudflare"
 import { useLoaderData } from "@remix-run/react"
 import { getFrontPage } from "~/models/frontpage.server"
 import { Seo } from "~/utils/seo"
