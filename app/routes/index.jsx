@@ -12,6 +12,8 @@ export const meta = ({data}) => {
 export let loader = async () => {
   const { menu, pageBy } = await getFrontPage()
 
+  console.log(pageBy)
+
   return json({page: pageBy, menu})
 }
 

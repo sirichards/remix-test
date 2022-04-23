@@ -1,7 +1,6 @@
-import { gql } from "graphql-request"
 import { createNewClient } from "~/client.server"
 
-const query = gql`
+const query = `
   query PAGES {
     pages {
       edges {
@@ -17,7 +16,7 @@ const query = gql`
 
 export async function getPages() {
   // query page by path/uri  + menus
-  const pages = await createNewClient().request(query)
+  const pages = await createNewClient(query)
   
   console.log(pages)
 
