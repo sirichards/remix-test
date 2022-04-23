@@ -1,3 +1,4 @@
+import { json } from "@remix-run/cloudflare"
 import {
   Links,
   LiveReload,
@@ -5,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData
 } from "@remix-run/react";
 
 export const meta = () => ({
@@ -15,10 +17,15 @@ export const meta = () => ({
 
 export let loader = async ({env}) => {
   console.log(env)
-  return {}
+  return json({
+    ENV: {
+      env: env,
+    },
+  });
 }
 
 export default function App() {
+  const data = useLoaderData();
   return (
     <html lang="en">
       <head>
@@ -28,6 +35,13 @@ export default function App() {
       <body>
         <Outlet />
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(
+              data.ENV
+            )} console.log(${data.ENV})`,
+          }}
+        />
         <Scripts />
         <LiveReload />
       </body>
