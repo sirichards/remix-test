@@ -1098,7 +1098,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect5(create, deps) {
+        function useEffect4(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1668,7 +1668,7 @@ var require_react_development = __commonJS({
         exports.useCallback = useCallback5;
         exports.useContext = useContext4;
         exports.useDebugValue = useDebugValue;
-        exports.useEffect = useEffect5;
+        exports.useEffect = useEffect4;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useLayoutEffect = useLayoutEffect4;
         exports.useMemo = useMemo4;
@@ -1967,7 +1967,7 @@ var init_responses = __esm({
         headers
       }));
     };
-    redirect = (url2, init2 = 302) => {
+    redirect = (url, init2 = 302) => {
       let responseInit = init2;
       if (typeof responseInit === "number") {
         responseInit = {
@@ -1977,7 +1977,7 @@ var init_responses = __esm({
         responseInit.status = 302;
       }
       let headers = new Headers(responseInit.headers);
-      headers.set("Location", url2);
+      headers.set("Location", url);
       return new Response(null, __spreadProps(__spreadValues({}, responseInit), {
         headers
       }));
@@ -2026,13 +2026,13 @@ async function callRouteLoader({
   match,
   request
 }) {
-  let loader8 = match.route.module.loader;
-  if (!loader8) {
+  let loader = match.route.module.loader;
+  if (!loader) {
     throw new Error(`You made a ${request.method} request to ${request.url} but did not provide a \`loader\` for route "${match.route.id}", so there is no way to handle the request.`);
   }
   let result;
   try {
-    result = await loader8({
+    result = await loader({
       request: stripDataParam(stripIndexParam(request.clone())),
       context: loadContext,
       params: match.params
@@ -2052,9 +2052,9 @@ async function callRouteLoader({
   return isResponse(result) ? result : json(result);
 }
 function stripIndexParam(request) {
-  let url2 = new URL(request.url);
-  let indexValues = url2.searchParams.getAll("index");
-  url2.searchParams.delete("index");
+  let url = new URL(request.url);
+  let indexValues = url.searchParams.getAll("index");
+  url.searchParams.delete("index");
   let indexValuesToKeep = [];
   for (let indexValue of indexValues) {
     if (indexValue) {
@@ -2062,14 +2062,14 @@ function stripIndexParam(request) {
     }
   }
   for (let toKeep of indexValuesToKeep) {
-    url2.searchParams.append("index", toKeep);
+    url.searchParams.append("index", toKeep);
   }
-  return new Request(url2.href, request);
+  return new Request(url.href, request);
 }
 function stripDataParam(request) {
-  let url2 = new URL(request.url);
-  url2.searchParams.delete("_data");
-  return new Request(url2.href, request);
+  let url = new URL(request.url);
+  url.searchParams.delete("_data");
+  return new Request(url.href, request);
 }
 function extractData(response) {
   let contentType = response.headers.get("Content-Type");
@@ -2093,9 +2093,9 @@ function createEntryMatches(matches, routes2) {
     route: routes2[match.route.id]
   }));
 }
-function createEntryRouteModules(manifest2) {
-  return Object.keys(manifest2).reduce((memo, routeId) => {
-    memo[routeId] = manifest2[routeId].module;
+function createEntryRouteModules(manifest) {
+  return Object.keys(manifest).reduce((memo, routeId) => {
+    memo[routeId] = manifest[routeId].module;
     return memo;
   }, {});
 }
@@ -2413,18 +2413,18 @@ function flattenRoutes(routes2, branches, parentsMeta, parentPath) {
     parentPath = "";
   }
   routes2.forEach((route, index) => {
-    let meta5 = {
+    let meta2 = {
       relativePath: route.path || "",
       caseSensitive: route.caseSensitive === true,
       childrenIndex: index,
       route
     };
-    if (meta5.relativePath.startsWith("/")) {
-      !meta5.relativePath.startsWith(parentPath) ? true ? invariant(false, 'Absolute route path "' + meta5.relativePath + '" nested under path ' + ('"' + parentPath + '" is not valid. An absolute child route path ') + "must start with the combined path of all its parent routes.") : invariant(false) : void 0;
-      meta5.relativePath = meta5.relativePath.slice(parentPath.length);
+    if (meta2.relativePath.startsWith("/")) {
+      !meta2.relativePath.startsWith(parentPath) ? true ? invariant(false, 'Absolute route path "' + meta2.relativePath + '" nested under path ' + ('"' + parentPath + '" is not valid. An absolute child route path ') + "must start with the combined path of all its parent routes.") : invariant(false) : void 0;
+      meta2.relativePath = meta2.relativePath.slice(parentPath.length);
     }
-    let path = joinPaths([parentPath, meta5.relativePath]);
-    let routesMeta = parentsMeta.concat(meta5);
+    let path = joinPaths([parentPath, meta2.relativePath]);
+    let routesMeta = parentsMeta.concat(meta2);
     if (route.children && route.children.length > 0) {
       !(route.index !== true) ? true ? invariant(false, "Index routes must not have child routes. Please remove " + ('all child routes from route path "' + path + '".')) : invariant(false) : void 0;
       flattenRoutes(route.children, branches, routesMeta, path);
@@ -2441,7 +2441,7 @@ function flattenRoutes(routes2, branches, parentsMeta, parentPath) {
   return branches;
 }
 function rankRouteBranches(branches) {
-  branches.sort((a, b) => a.score !== b.score ? b.score - a.score : compareIndexes(a.routesMeta.map((meta5) => meta5.childrenIndex), b.routesMeta.map((meta5) => meta5.childrenIndex)));
+  branches.sort((a, b) => a.score !== b.score ? b.score - a.score : compareIndexes(a.routesMeta.map((meta2) => meta2.childrenIndex), b.routesMeta.map((meta2) => meta2.childrenIndex)));
 }
 function computeScore(path, index) {
   let segments = path.split("/");
@@ -2466,18 +2466,18 @@ function matchRouteBranch(branch, pathname) {
   let matchedPathname = "/";
   let matches = [];
   for (let i = 0; i < routesMeta.length; ++i) {
-    let meta5 = routesMeta[i];
+    let meta2 = routesMeta[i];
     let end = i === routesMeta.length - 1;
     let remainingPathname = matchedPathname === "/" ? pathname : pathname.slice(matchedPathname.length) || "/";
     let match = matchPath({
-      path: meta5.relativePath,
-      caseSensitive: meta5.caseSensitive,
+      path: meta2.relativePath,
+      caseSensitive: meta2.caseSensitive,
       end
     }, remainingPathname);
     if (!match)
       return null;
     Object.assign(matchedParams, match.params);
-    let route = meta5.route;
+    let route = meta2.route;
     matches.push({
       params: matchedParams,
       pathname: joinPaths([matchedPathname, match.pathname]),
@@ -3035,9 +3035,9 @@ var init_routeMatching = __esm({
 });
 
 // node_modules/@remix-run/server-runtime/esm/routes.js
-function createRoutes(manifest2, parentId) {
-  return Object.entries(manifest2).filter(([, route]) => route.parentId === parentId).map(([id, route]) => __spreadProps(__spreadValues({}, route), {
-    children: createRoutes(manifest2, id)
+function createRoutes(manifest, parentId) {
+  return Object.entries(manifest).filter(([, route]) => route.parentId === parentId).map(([id, route]) => __spreadProps(__spreadValues({}, route), {
+    children: createRoutes(manifest, id)
   }));
 }
 var init_routes = __esm({
@@ -3143,8 +3143,8 @@ var require_jsesc = __commonJS({
         "__inline1__": false,
         "__inline2__": false
       };
-      const json5 = options && options.json;
-      if (json5) {
+      const json2 = options && options.json;
+      if (json2) {
         defaults.quotes = "double";
         defaults.wrap = true;
       }
@@ -3166,7 +3166,7 @@ var require_jsesc = __commonJS({
       const useOctNumbers = options.numbers == "octal";
       const useDecNumbers = options.numbers == "decimal";
       const useHexNumbers = options.numbers == "hexadecimal";
-      if (json5 && argument && isFunction2(argument.toJSON)) {
+      if (json2 && argument && isFunction2(argument.toJSON)) {
         argument = argument.toJSON();
       }
       if (!isString2(argument)) {
@@ -3217,7 +3217,7 @@ var require_jsesc = __commonJS({
           }
           return "[" + newLine + result.join("," + newLine) + newLine + (compact ? "" : oldIndent) + "]";
         } else if (isNumber2(argument)) {
-          if (json5) {
+          if (json2) {
             return JSON.stringify(argument);
           }
           if (useDecNumbers) {
@@ -3237,7 +3237,7 @@ var require_jsesc = __commonJS({
             return "0o" + argument.toString(8);
           }
         } else if (!isObject2(argument)) {
-          if (json5) {
+          if (json2) {
             return JSON.stringify(argument) || "null";
           }
           return String(argument);
@@ -3272,7 +3272,7 @@ var require_jsesc = __commonJS({
         if (lone) {
           return fourHexEscape(hexadecimal(lone.charCodeAt(0), lowercaseHex));
         }
-        if (char == "\0" && !json5 && !regexDigit.test(string.charAt(index + 1))) {
+        if (char == "\0" && !json2 && !regexDigit.test(string.charAt(index + 1))) {
           return "\\0";
         }
         if (quoteChar) {
@@ -3288,7 +3288,7 @@ var require_jsesc = __commonJS({
           return char;
         }
         const hex2 = hexadecimal(char.charCodeAt(0), lowercaseHex);
-        if (json5 || hex2.length > 2) {
+        if (json2 || hex2.length > 2) {
           return fourHexEscape(hex2);
         }
         return "\\x" + ("00" + hex2).slice(-2);
@@ -3297,7 +3297,7 @@ var require_jsesc = __commonJS({
         result = result.replace(/\$\{/g, "\\${");
       }
       if (options.isScriptContext) {
-        result = result.replace(/<\/(script|style)/gi, "<\\/$1").replace(/<!--/g, json5 ? "\\u003C!--" : "\\x3C!--");
+        result = result.replace(/<\/(script|style)/gi, "<\\/$1").replace(/<!--/g, json2 ? "\\u003C!--" : "\\x3C!--");
       }
       if (options.wrap) {
         result = quote + result + quote;
@@ -3334,28 +3334,28 @@ async function handleDataRequest({
   if (!isValidRequestMethod(request)) {
     return errorBoundaryError(new Error(`Invalid request method "${request.method}"`), 405);
   }
-  let url2 = new URL(request.url);
+  let url = new URL(request.url);
   if (!matches) {
-    return errorBoundaryError(new Error(`No route matches URL "${url2.pathname}"`), 404);
+    return errorBoundaryError(new Error(`No route matches URL "${url.pathname}"`), 404);
   }
   let response;
   let match;
   try {
     if (isActionRequest(request)) {
-      match = getRequestMatch(url2, matches);
+      match = getRequestMatch(url, matches);
       response = await callRouteAction({
         loadContext,
         match,
         request
       });
     } else {
-      let routeId = url2.searchParams.get("_data");
+      let routeId = url.searchParams.get("_data");
       if (!routeId) {
         return errorBoundaryError(new Error(`Missing route id in ?_data`), 403);
       }
       let tempMatch = matches.find((match2) => match2.route.id === routeId);
       if (!tempMatch) {
-        return errorBoundaryError(new Error(`Route "${routeId}" does not match URL "${url2.pathname}"`), 403);
+        return errorBoundaryError(new Error(`Route "${routeId}" does not match URL "${url.pathname}"`), 403);
       }
       match = tempMatch;
       response = await callRouteLoader({
@@ -3402,7 +3402,7 @@ async function handleDocumentRequest({
   routes: routes2,
   serverMode
 }) {
-  let url2 = new URL(request.url);
+  let url = new URL(request.url);
   let appState = {
     trackBoundaries: true,
     trackCatchBoundaries: true,
@@ -3433,7 +3433,7 @@ async function handleDocumentRequest({
   let actionMatch;
   let actionResponse;
   if (matches && isActionRequest(request)) {
-    actionMatch = getRequestMatch(url2, matches);
+    actionMatch = getRequestMatch(url, matches);
     try {
       actionResponse = await callRouteAction({
         loadContext,
@@ -3653,17 +3653,17 @@ async function errorBoundaryError(error, status) {
     }
   });
 }
-function isIndexRequestUrl(url2) {
-  for (let param of url2.searchParams.getAll("index")) {
+function isIndexRequestUrl(url) {
+  for (let param of url.searchParams.getAll("index")) {
     if (param === "") {
       return true;
     }
   }
   return false;
 }
-function getRequestMatch(url2, matches) {
+function getRequestMatch(url, matches) {
   let match = matches.slice(-1)[0];
-  if (!isIndexRequestUrl(url2) && match.route.id.endsWith("/index")) {
+  if (!isIndexRequestUrl(url) && match.route.id.endsWith("/index")) {
     return matches.slice(-2)[0];
   }
   return match;
@@ -3717,10 +3717,10 @@ var init_server = __esm({
       let routes2 = createRoutes(build.routes);
       let serverMode = isServerMode(mode) ? mode : ServerMode.Production;
       return async function requestHandler(request, loadContext) {
-        let url2 = new URL(request.url);
-        let matches = matchServerRoutes(routes2, url2.pathname);
+        let url = new URL(request.url);
+        let matches = matchServerRoutes(routes2, url.pathname);
         let response;
-        if (url2.searchParams.has("_data")) {
+        if (url.searchParams.has("_data")) {
           response = await handleDataRequest({
             request,
             loadContext,
@@ -8243,11 +8243,11 @@ var require_react_dom_server_node_development = __commonJS({
         var stream = require_stream();
         var ReactVersion = "17.0.2";
         function formatProdErrorMessage(code) {
-          var url2 = "https://reactjs.org/docs/error-decoder.html?invariant=" + code;
+          var url = "https://reactjs.org/docs/error-decoder.html?invariant=" + code;
           for (var i2 = 1; i2 < arguments.length; i2++) {
-            url2 += "&args[]=" + encodeURIComponent(arguments[i2]);
+            url += "&args[]=" + encodeURIComponent(arguments[i2]);
           }
-          return "Minified React error #" + code + "; visit " + url2 + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
+          return "Minified React error #" + code + "; visit " + url + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
         }
         var ReactSharedInternals = React6.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function warn(format2) {
@@ -9085,11 +9085,11 @@ var require_react_dom_server_node_development = __commonJS({
         });
         var isJavaScriptProtocol = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
         var didWarn = false;
-        function sanitizeURL(url2) {
+        function sanitizeURL(url) {
           {
-            if (!didWarn && isJavaScriptProtocol.test(url2)) {
+            if (!didWarn && isJavaScriptProtocol.test(url)) {
               didWarn = true;
-              error("A future version of React will block javascript: URLs as a security precaution. Use event handlers instead if you can. If you need to generate unsafe HTML try using dangerouslySetInnerHTML instead. React was passed %s.", JSON.stringify(url2));
+              error("A future version of React will block javascript: URLs as a security precaution. Use event handlers instead if you can. If you need to generate unsafe HTML try using dangerouslySetInnerHTML instead. React was passed %s.", JSON.stringify(url));
             }
           }
         }
@@ -11570,1845 +11570,6 @@ var require_server = __commonJS({
   }
 });
 
-// node_modules/postscribe/dist/postscribe.js
-var require_postscribe = __commonJS({
-  "node_modules/postscribe/dist/postscribe.js"(exports, module) {
-    init_react();
-    (function webpackUniversalModuleDefinition(root, factory) {
-      if (typeof exports === "object" && typeof module === "object")
-        module.exports = factory();
-      else if (typeof define === "function" && define.amd)
-        define([], factory);
-      else if (typeof exports === "object")
-        exports["postscribe"] = factory();
-      else
-        root["postscribe"] = factory();
-    })(exports, function() {
-      return function(modules) {
-        var installedModules = {};
-        function __webpack_require__(moduleId) {
-          if (installedModules[moduleId])
-            return installedModules[moduleId].exports;
-          var module2 = installedModules[moduleId] = {
-            exports: {},
-            id: moduleId,
-            loaded: false
-          };
-          modules[moduleId].call(module2.exports, module2, module2.exports, __webpack_require__);
-          module2.loaded = true;
-          return module2.exports;
-        }
-        __webpack_require__.m = modules;
-        __webpack_require__.c = installedModules;
-        __webpack_require__.p = "";
-        return __webpack_require__(0);
-      }([
-        function(module2, exports2, __webpack_require__) {
-          "use strict";
-          var _postscribe = __webpack_require__(1);
-          var _postscribe2 = _interopRequireDefault(_postscribe);
-          function _interopRequireDefault(obj) {
-            return obj && obj.__esModule ? obj : { "default": obj };
-          }
-          module2.exports = _postscribe2["default"];
-        },
-        function(module2, exports2, __webpack_require__) {
-          "use strict";
-          exports2.__esModule = true;
-          var _extends4 = Object.assign || function(target) {
-            for (var i = 1; i < arguments.length; i++) {
-              var source = arguments[i];
-              for (var key in source) {
-                if (Object.prototype.hasOwnProperty.call(source, key)) {
-                  target[key] = source[key];
-                }
-              }
-            }
-            return target;
-          };
-          exports2["default"] = postscribe;
-          var _writeStream = __webpack_require__(2);
-          var _writeStream2 = _interopRequireDefault(_writeStream);
-          var _utils = __webpack_require__(4);
-          var utils = _interopRequireWildcard(_utils);
-          function _interopRequireWildcard(obj) {
-            if (obj && obj.__esModule) {
-              return obj;
-            } else {
-              var newObj = {};
-              if (obj != null) {
-                for (var key in obj) {
-                  if (Object.prototype.hasOwnProperty.call(obj, key))
-                    newObj[key] = obj[key];
-                }
-              }
-              newObj["default"] = obj;
-              return newObj;
-            }
-          }
-          function _interopRequireDefault(obj) {
-            return obj && obj.__esModule ? obj : { "default": obj };
-          }
-          function doNothing() {
-          }
-          var OPTIONS = {
-            afterAsync: doNothing,
-            afterDequeue: doNothing,
-            afterStreamStart: doNothing,
-            afterWrite: doNothing,
-            autoFix: true,
-            beforeEnqueue: doNothing,
-            beforeWriteToken: function beforeWriteToken(tok) {
-              return tok;
-            },
-            beforeWrite: function beforeWrite(str) {
-              return str;
-            },
-            done: doNothing,
-            error: function error(e) {
-              throw new Error(e.msg);
-            },
-            releaseAsync: false
-          };
-          var nextId = 0;
-          var queue2 = [];
-          var active = null;
-          function nextStream() {
-            var args = queue2.shift();
-            if (args) {
-              var options = utils.last(args);
-              options.afterDequeue();
-              args.stream = runStream.apply(void 0, args);
-              options.afterStreamStart();
-            }
-          }
-          function runStream(el, html, options) {
-            active = new _writeStream2["default"](el, options);
-            active.id = nextId++;
-            active.name = options.name || active.id;
-            postscribe.streams[active.name] = active;
-            var doc = el.ownerDocument;
-            var stash = {
-              close: doc.close,
-              open: doc.open,
-              write: doc.write,
-              writeln: doc.writeln
-            };
-            function _write(str) {
-              str = options.beforeWrite(str);
-              active.write(str);
-              options.afterWrite(str);
-            }
-            _extends4(doc, {
-              close: doNothing,
-              open: doNothing,
-              write: function write3() {
-                for (var _len = arguments.length, str = Array(_len), _key = 0; _key < _len; _key++) {
-                  str[_key] = arguments[_key];
-                }
-                return _write(str.join(""));
-              },
-              writeln: function writeln() {
-                for (var _len2 = arguments.length, str = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                  str[_key2] = arguments[_key2];
-                }
-                return _write(str.join("") + "\n");
-              }
-            });
-            var oldOnError = active.win.onerror || doNothing;
-            active.win.onerror = function(msg, url2, line) {
-              options.error({ msg: msg + " - " + url2 + ": " + line });
-              oldOnError.apply(active.win, [msg, url2, line]);
-            };
-            active.write(html, function() {
-              _extends4(doc, stash);
-              active.win.onerror = oldOnError;
-              options.done();
-              active = null;
-              nextStream();
-            });
-            return active;
-          }
-          function postscribe(el, html, options) {
-            if (utils.isFunction(options)) {
-              options = { done: options };
-            } else if (options === "clear") {
-              queue2 = [];
-              active = null;
-              nextId = 0;
-              return;
-            }
-            options = utils.defaults(options, OPTIONS);
-            if (/^#/.test(el)) {
-              el = window.document.getElementById(el.substr(1));
-            } else {
-              el = el.jquery ? el[0] : el;
-            }
-            var args = [el, html, options];
-            el.postscribe = {
-              cancel: function cancel() {
-                if (args.stream) {
-                  args.stream.abort();
-                } else {
-                  args[1] = doNothing;
-                }
-              }
-            };
-            options.beforeEnqueue(args);
-            queue2.push(args);
-            if (!active) {
-              nextStream();
-            }
-            return el.postscribe;
-          }
-          _extends4(postscribe, {
-            streams: {},
-            queue: queue2,
-            WriteStream: _writeStream2["default"]
-          });
-        },
-        function(module2, exports2, __webpack_require__) {
-          "use strict";
-          exports2.__esModule = true;
-          var _extends4 = Object.assign || function(target) {
-            for (var i = 1; i < arguments.length; i++) {
-              var source = arguments[i];
-              for (var key in source) {
-                if (Object.prototype.hasOwnProperty.call(source, key)) {
-                  target[key] = source[key];
-                }
-              }
-            }
-            return target;
-          };
-          var _prescribe = __webpack_require__(3);
-          var _prescribe2 = _interopRequireDefault(_prescribe);
-          var _utils = __webpack_require__(4);
-          var utils = _interopRequireWildcard(_utils);
-          function _interopRequireWildcard(obj) {
-            if (obj && obj.__esModule) {
-              return obj;
-            } else {
-              var newObj = {};
-              if (obj != null) {
-                for (var key in obj) {
-                  if (Object.prototype.hasOwnProperty.call(obj, key))
-                    newObj[key] = obj[key];
-                }
-              }
-              newObj["default"] = obj;
-              return newObj;
-            }
-          }
-          function _interopRequireDefault(obj) {
-            return obj && obj.__esModule ? obj : { "default": obj };
-          }
-          function _classCallCheck(instance, Constructor) {
-            if (!(instance instanceof Constructor)) {
-              throw new TypeError("Cannot call a class as a function");
-            }
-          }
-          var DEBUG_CHUNK = false;
-          var BASEATTR = "data-ps-";
-          var PROXY_STYLE = "ps-style";
-          var PROXY_SCRIPT = "ps-script";
-          function getData(el, name) {
-            var attr = BASEATTR + name;
-            var val = el.getAttribute(attr);
-            return !utils.existy(val) ? val : String(val);
-          }
-          function setData(el, name) {
-            var value = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : null;
-            var attr = BASEATTR + name;
-            if (utils.existy(value) && value !== "") {
-              el.setAttribute(attr, value);
-            } else {
-              el.removeAttribute(attr);
-            }
-          }
-          var WriteStream = function() {
-            function WriteStream2(root) {
-              var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-              _classCallCheck(this, WriteStream2);
-              this.root = root;
-              this.options = options;
-              this.doc = root.ownerDocument;
-              this.win = this.doc.defaultView || this.doc.parentWindow;
-              this.parser = new _prescribe2["default"]("", { autoFix: options.autoFix });
-              this.actuals = [root];
-              this.proxyHistory = "";
-              this.proxyRoot = this.doc.createElement(root.nodeName);
-              this.scriptStack = [];
-              this.writeQueue = [];
-              setData(this.proxyRoot, "proxyof", 0);
-            }
-            WriteStream2.prototype.write = function write3() {
-              var _writeQueue;
-              (_writeQueue = this.writeQueue).push.apply(_writeQueue, arguments);
-              while (!this.deferredRemote && this.writeQueue.length) {
-                var arg = this.writeQueue.shift();
-                if (utils.isFunction(arg)) {
-                  this._callFunction(arg);
-                } else {
-                  this._writeImpl(arg);
-                }
-              }
-            };
-            WriteStream2.prototype._callFunction = function _callFunction(fn) {
-              var tok = { type: "function", value: fn.name || fn.toString() };
-              this._onScriptStart(tok);
-              fn.call(this.win, this.doc);
-              this._onScriptDone(tok);
-            };
-            WriteStream2.prototype._writeImpl = function _writeImpl(html) {
-              this.parser.append(html);
-              var tok = void 0;
-              var script = void 0;
-              var style = void 0;
-              var tokens = [];
-              while ((tok = this.parser.readToken()) && !(script = utils.isScript(tok)) && !(style = utils.isStyle(tok))) {
-                tok = this.options.beforeWriteToken(tok);
-                if (tok) {
-                  tokens.push(tok);
-                }
-              }
-              if (tokens.length > 0) {
-                this._writeStaticTokens(tokens);
-              }
-              if (script) {
-                this._handleScriptToken(tok);
-              }
-              if (style) {
-                this._handleStyleToken(tok);
-              }
-            };
-            WriteStream2.prototype._writeStaticTokens = function _writeStaticTokens(tokens) {
-              var chunk = this._buildChunk(tokens);
-              if (!chunk.actual) {
-                return null;
-              }
-              chunk.html = this.proxyHistory + chunk.actual;
-              this.proxyHistory += chunk.proxy;
-              this.proxyRoot.innerHTML = chunk.html;
-              if (DEBUG_CHUNK) {
-                chunk.proxyInnerHTML = this.proxyRoot.innerHTML;
-              }
-              this._walkChunk();
-              if (DEBUG_CHUNK) {
-                chunk.actualInnerHTML = this.root.innerHTML;
-              }
-              return chunk;
-            };
-            WriteStream2.prototype._buildChunk = function _buildChunk(tokens) {
-              var nextId = this.actuals.length;
-              var raw = [];
-              var actual = [];
-              var proxy = [];
-              var len = tokens.length;
-              for (var i = 0; i < len; i++) {
-                var tok = tokens[i];
-                var tokenRaw = tok.toString();
-                raw.push(tokenRaw);
-                if (tok.attrs) {
-                  if (!/^noscript$/i.test(tok.tagName)) {
-                    var id = nextId++;
-                    actual.push(tokenRaw.replace(/(\/?>)/, " " + BASEATTR + "id=" + id + " $1"));
-                    if (tok.attrs.id !== PROXY_SCRIPT && tok.attrs.id !== PROXY_STYLE) {
-                      proxy.push(tok.type === "atomicTag" ? "" : "<" + tok.tagName + " " + BASEATTR + "proxyof=" + id + (tok.unary ? " />" : ">"));
-                    }
-                  }
-                } else {
-                  actual.push(tokenRaw);
-                  proxy.push(tok.type === "endTag" ? tokenRaw : "");
-                }
-              }
-              return {
-                tokens,
-                raw: raw.join(""),
-                actual: actual.join(""),
-                proxy: proxy.join("")
-              };
-            };
-            WriteStream2.prototype._walkChunk = function _walkChunk() {
-              var node = void 0;
-              var stack = [this.proxyRoot];
-              while (utils.existy(node = stack.shift())) {
-                var isElement = node.nodeType === 1;
-                var isProxy = isElement && getData(node, "proxyof");
-                if (!isProxy) {
-                  if (isElement) {
-                    this.actuals[getData(node, "id")] = node;
-                    setData(node, "id");
-                  }
-                  var parentIsProxyOf = node.parentNode && getData(node.parentNode, "proxyof");
-                  if (parentIsProxyOf) {
-                    this.actuals[parentIsProxyOf].appendChild(node);
-                  }
-                }
-                stack.unshift.apply(stack, utils.toArray(node.childNodes));
-              }
-            };
-            WriteStream2.prototype._handleScriptToken = function _handleScriptToken(tok) {
-              var _this = this;
-              var remainder = this.parser.clear();
-              if (remainder) {
-                this.writeQueue.unshift(remainder);
-              }
-              tok.src = tok.attrs.src || tok.attrs.SRC;
-              tok = this.options.beforeWriteToken(tok);
-              if (!tok) {
-                return;
-              }
-              if (tok.src && this.scriptStack.length) {
-                this.deferredRemote = tok;
-              } else {
-                this._onScriptStart(tok);
-              }
-              this._writeScriptToken(tok, function() {
-                _this._onScriptDone(tok);
-              });
-            };
-            WriteStream2.prototype._handleStyleToken = function _handleStyleToken(tok) {
-              var remainder = this.parser.clear();
-              if (remainder) {
-                this.writeQueue.unshift(remainder);
-              }
-              tok.type = tok.attrs.type || tok.attrs.TYPE || "text/css";
-              tok = this.options.beforeWriteToken(tok);
-              if (tok) {
-                this._writeStyleToken(tok);
-              }
-              if (remainder) {
-                this.write();
-              }
-            };
-            WriteStream2.prototype._writeStyleToken = function _writeStyleToken(tok) {
-              var el = this._buildStyle(tok);
-              this._insertCursor(el, PROXY_STYLE);
-              if (tok.content) {
-                if (el.styleSheet && !el.sheet) {
-                  el.styleSheet.cssText = tok.content;
-                } else {
-                  el.appendChild(this.doc.createTextNode(tok.content));
-                }
-              }
-            };
-            WriteStream2.prototype._buildStyle = function _buildStyle(tok) {
-              var el = this.doc.createElement(tok.tagName);
-              el.setAttribute("type", tok.type);
-              utils.eachKey(tok.attrs, function(name, value) {
-                el.setAttribute(name, value);
-              });
-              return el;
-            };
-            WriteStream2.prototype._insertCursor = function _insertCursor(el, which) {
-              this._writeImpl('<span id="' + which + '"/>');
-              var cursor = this.doc.getElementById(which);
-              if (cursor) {
-                cursor.parentNode.replaceChild(el, cursor);
-              }
-            };
-            WriteStream2.prototype._onScriptStart = function _onScriptStart(tok) {
-              tok.outerWrites = this.writeQueue;
-              this.writeQueue = [];
-              this.scriptStack.unshift(tok);
-            };
-            WriteStream2.prototype._onScriptDone = function _onScriptDone(tok) {
-              if (tok !== this.scriptStack[0]) {
-                this.options.error({ msg: "Bad script nesting or script finished twice" });
-                return;
-              }
-              this.scriptStack.shift();
-              this.write.apply(this, tok.outerWrites);
-              if (!this.scriptStack.length && this.deferredRemote) {
-                this._onScriptStart(this.deferredRemote);
-                this.deferredRemote = null;
-              }
-            };
-            WriteStream2.prototype._writeScriptToken = function _writeScriptToken(tok, done2) {
-              var el = this._buildScript(tok);
-              var asyncRelease = this._shouldRelease(el);
-              var afterAsync = this.options.afterAsync;
-              if (tok.src) {
-                el.src = tok.src;
-                this._scriptLoadHandler(el, !asyncRelease ? function() {
-                  done2();
-                  afterAsync();
-                } : afterAsync);
-              }
-              try {
-                this._insertCursor(el, PROXY_SCRIPT);
-                if (!el.src || asyncRelease) {
-                  done2();
-                }
-              } catch (e) {
-                this.options.error(e);
-                done2();
-              }
-            };
-            WriteStream2.prototype._buildScript = function _buildScript(tok) {
-              var el = this.doc.createElement(tok.tagName);
-              utils.eachKey(tok.attrs, function(name, value) {
-                el.setAttribute(name, value);
-              });
-              if (tok.content) {
-                el.text = tok.content;
-              }
-              return el;
-            };
-            WriteStream2.prototype._scriptLoadHandler = function _scriptLoadHandler(el, done2) {
-              function cleanup() {
-                el = el.onload = el.onreadystatechange = el.onerror = null;
-              }
-              var error = this.options.error;
-              function success() {
-                cleanup();
-                if (done2 != null) {
-                  done2();
-                }
-                done2 = null;
-              }
-              function failure(err) {
-                cleanup();
-                error(err);
-                if (done2 != null) {
-                  done2();
-                }
-                done2 = null;
-              }
-              function reattachEventListener(el2, evt) {
-                var handler = el2["on" + evt];
-                if (handler != null) {
-                  el2["_on" + evt] = handler;
-                }
-              }
-              reattachEventListener(el, "load");
-              reattachEventListener(el, "error");
-              _extends4(el, {
-                onload: function onload() {
-                  if (el._onload) {
-                    try {
-                      el._onload.apply(this, Array.prototype.slice.call(arguments, 0));
-                    } catch (err) {
-                      failure({ msg: "onload handler failed " + err + " @ " + el.src });
-                    }
-                  }
-                  success();
-                },
-                onerror: function onerror() {
-                  if (el._onerror) {
-                    try {
-                      el._onerror.apply(this, Array.prototype.slice.call(arguments, 0));
-                    } catch (err) {
-                      failure({ msg: "onerror handler failed " + err + " @ " + el.src });
-                      return;
-                    }
-                  }
-                  failure({ msg: "remote script failed " + el.src });
-                },
-                onreadystatechange: function onreadystatechange() {
-                  if (/^(loaded|complete)$/.test(el.readyState)) {
-                    success();
-                  }
-                }
-              });
-            };
-            WriteStream2.prototype._shouldRelease = function _shouldRelease(el) {
-              var isScript = /^script$/i.test(el.nodeName);
-              return !isScript || !!(this.options.releaseAsync && el.src && el.hasAttribute("async"));
-            };
-            return WriteStream2;
-          }();
-          exports2["default"] = WriteStream;
-        },
-        function(module2, exports2, __webpack_require__) {
-          (function webpackUniversalModuleDefinition(root, factory) {
-            if (true)
-              module2.exports = factory();
-            else if (typeof define === "function" && define.amd)
-              define([], factory);
-            else if (typeof exports2 === "object")
-              exports2["Prescribe"] = factory();
-            else
-              root["Prescribe"] = factory();
-          })(this, function() {
-            return function(modules) {
-              var installedModules = {};
-              function __webpack_require__2(moduleId) {
-                if (installedModules[moduleId])
-                  return installedModules[moduleId].exports;
-                var module3 = installedModules[moduleId] = {
-                  exports: {},
-                  id: moduleId,
-                  loaded: false
-                };
-                modules[moduleId].call(module3.exports, module3, module3.exports, __webpack_require__2);
-                module3.loaded = true;
-                return module3.exports;
-              }
-              __webpack_require__2.m = modules;
-              __webpack_require__2.c = installedModules;
-              __webpack_require__2.p = "";
-              return __webpack_require__2(0);
-            }([
-              function(module3, exports3, __webpack_require__2) {
-                "use strict";
-                var _HtmlParser = __webpack_require__2(1);
-                var _HtmlParser2 = _interopRequireDefault(_HtmlParser);
-                function _interopRequireDefault(obj) {
-                  return obj && obj.__esModule ? obj : { "default": obj };
-                }
-                module3.exports = _HtmlParser2["default"];
-              },
-              function(module3, exports3, __webpack_require__2) {
-                "use strict";
-                exports3.__esModule = true;
-                var _supports = __webpack_require__2(2);
-                var supports = _interopRequireWildcard(_supports);
-                var _streamReaders = __webpack_require__2(3);
-                var streamReaders = _interopRequireWildcard(_streamReaders);
-                var _fixedReadTokenFactory = __webpack_require__2(6);
-                var _fixedReadTokenFactory2 = _interopRequireDefault(_fixedReadTokenFactory);
-                var _utils = __webpack_require__2(5);
-                function _interopRequireDefault(obj) {
-                  return obj && obj.__esModule ? obj : { "default": obj };
-                }
-                function _interopRequireWildcard(obj) {
-                  if (obj && obj.__esModule) {
-                    return obj;
-                  } else {
-                    var newObj = {};
-                    if (obj != null) {
-                      for (var key2 in obj) {
-                        if (Object.prototype.hasOwnProperty.call(obj, key2))
-                          newObj[key2] = obj[key2];
-                      }
-                    }
-                    newObj["default"] = obj;
-                    return newObj;
-                  }
-                }
-                function _classCallCheck(instance, Constructor) {
-                  if (!(instance instanceof Constructor)) {
-                    throw new TypeError("Cannot call a class as a function");
-                  }
-                }
-                var detect = {
-                  comment: /^<!--/,
-                  endTag: /^<\//,
-                  atomicTag: /^<\s*(script|style|noscript|iframe|textarea)[\s\/>]/i,
-                  startTag: /^</,
-                  chars: /^[^<]/
-                };
-                var HtmlParser = function() {
-                  function HtmlParser2() {
-                    var _this = this;
-                    var stream = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : "";
-                    var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-                    _classCallCheck(this, HtmlParser2);
-                    this.stream = stream;
-                    var fix = false;
-                    var fixedTokenOptions = {};
-                    for (var key2 in supports) {
-                      if (supports.hasOwnProperty(key2)) {
-                        if (options.autoFix) {
-                          fixedTokenOptions[key2 + "Fix"] = true;
-                        }
-                        fix = fix || fixedTokenOptions[key2 + "Fix"];
-                      }
-                    }
-                    if (fix) {
-                      this._readToken = (0, _fixedReadTokenFactory2["default"])(this, fixedTokenOptions, function() {
-                        return _this._readTokenImpl();
-                      });
-                      this._peekToken = (0, _fixedReadTokenFactory2["default"])(this, fixedTokenOptions, function() {
-                        return _this._peekTokenImpl();
-                      });
-                    } else {
-                      this._readToken = this._readTokenImpl;
-                      this._peekToken = this._peekTokenImpl;
-                    }
-                  }
-                  HtmlParser2.prototype.append = function append(str) {
-                    this.stream += str;
-                  };
-                  HtmlParser2.prototype.prepend = function prepend(str) {
-                    this.stream = str + this.stream;
-                  };
-                  HtmlParser2.prototype._readTokenImpl = function _readTokenImpl() {
-                    var token = this._peekTokenImpl();
-                    if (token) {
-                      this.stream = this.stream.slice(token.length);
-                      return token;
-                    }
-                  };
-                  HtmlParser2.prototype._peekTokenImpl = function _peekTokenImpl() {
-                    for (var type in detect) {
-                      if (detect.hasOwnProperty(type)) {
-                        if (detect[type].test(this.stream)) {
-                          var token = streamReaders[type](this.stream);
-                          if (token) {
-                            if (token.type === "startTag" && /script|style/i.test(token.tagName)) {
-                              return null;
-                            } else {
-                              token.text = this.stream.substr(0, token.length);
-                              return token;
-                            }
-                          }
-                        }
-                      }
-                    }
-                  };
-                  HtmlParser2.prototype.peekToken = function peekToken() {
-                    return this._peekToken();
-                  };
-                  HtmlParser2.prototype.readToken = function readToken() {
-                    return this._readToken();
-                  };
-                  HtmlParser2.prototype.readTokens = function readTokens(handlers) {
-                    var tok = void 0;
-                    while (tok = this.readToken()) {
-                      if (handlers[tok.type] && handlers[tok.type](tok) === false) {
-                        return;
-                      }
-                    }
-                  };
-                  HtmlParser2.prototype.clear = function clear() {
-                    var rest = this.stream;
-                    this.stream = "";
-                    return rest;
-                  };
-                  HtmlParser2.prototype.rest = function rest() {
-                    return this.stream;
-                  };
-                  return HtmlParser2;
-                }();
-                exports3["default"] = HtmlParser;
-                HtmlParser.tokenToString = function(tok) {
-                  return tok.toString();
-                };
-                HtmlParser.escapeAttributes = function(attrs) {
-                  var escapedAttrs = {};
-                  for (var name in attrs) {
-                    if (attrs.hasOwnProperty(name)) {
-                      escapedAttrs[name] = (0, _utils.escapeQuotes)(attrs[name], null);
-                    }
-                  }
-                  return escapedAttrs;
-                };
-                HtmlParser.supports = supports;
-                for (var key in supports) {
-                  if (supports.hasOwnProperty(key)) {
-                    HtmlParser.browserHasFlaw = HtmlParser.browserHasFlaw || !supports[key] && key;
-                  }
-                }
-              },
-              function(module3, exports3) {
-                "use strict";
-                exports3.__esModule = true;
-                var tagSoup = false;
-                var selfClose = false;
-                var work = window.document.createElement("div");
-                try {
-                  var html = "<P><I></P></I>";
-                  work.innerHTML = html;
-                  exports3.tagSoup = tagSoup = work.innerHTML !== html;
-                } catch (e) {
-                  exports3.tagSoup = tagSoup = false;
-                }
-                try {
-                  work.innerHTML = "<P><i><P></P></i></P>";
-                  exports3.selfClose = selfClose = work.childNodes.length === 2;
-                } catch (e) {
-                  exports3.selfClose = selfClose = false;
-                }
-                work = null;
-                exports3.tagSoup = tagSoup;
-                exports3.selfClose = selfClose;
-              },
-              function(module3, exports3, __webpack_require__2) {
-                "use strict";
-                exports3.__esModule = true;
-                var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-                  return typeof obj;
-                } : function(obj) {
-                  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-                };
-                exports3.comment = comment;
-                exports3.chars = chars;
-                exports3.startTag = startTag;
-                exports3.atomicTag = atomicTag;
-                exports3.endTag = endTag;
-                var _tokens = __webpack_require__2(4);
-                var REGEXES = {
-                  startTag: /^<([\-A-Za-z0-9_]+)((?:\s+[\w\-]+(?:\s*=?\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
-                  endTag: /^<\/([\-A-Za-z0-9_]+)[^>]*>/,
-                  attr: /(?:([\-A-Za-z0-9_]+)\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))|(?:([\-A-Za-z0-9_]+)(\s|$)+)/g,
-                  fillAttr: /^(checked|compact|declare|defer|disabled|ismap|multiple|nohref|noresize|noshade|nowrap|readonly|selected)$/i
-                };
-                function comment(stream) {
-                  var index = stream.indexOf("-->");
-                  if (index >= 0) {
-                    return new _tokens.CommentToken(stream.substr(4, index - 1), index + 3);
-                  }
-                }
-                function chars(stream) {
-                  var index = stream.indexOf("<");
-                  return new _tokens.CharsToken(index >= 0 ? index : stream.length);
-                }
-                function startTag(stream) {
-                  var endTagIndex = stream.indexOf(">");
-                  if (endTagIndex !== -1) {
-                    var match = stream.match(REGEXES.startTag);
-                    if (match) {
-                      var _ret = function() {
-                        var attrs = {};
-                        var booleanAttrs = {};
-                        var rest = match[2];
-                        match[2].replace(REGEXES.attr, function(match2, name) {
-                          if (!(arguments[2] || arguments[3] || arguments[4] || arguments[5])) {
-                            attrs[name] = "";
-                          } else if (arguments[5]) {
-                            attrs[arguments[5]] = "";
-                            booleanAttrs[arguments[5]] = true;
-                          } else {
-                            attrs[name] = arguments[2] || arguments[3] || arguments[4] || REGEXES.fillAttr.test(name) && name || "";
-                          }
-                          rest = rest.replace(match2, "");
-                        });
-                        return {
-                          v: new _tokens.StartTagToken(match[1], match[0].length, attrs, booleanAttrs, !!match[3], rest.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ""))
-                        };
-                      }();
-                      if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object")
-                        return _ret.v;
-                    }
-                  }
-                }
-                function atomicTag(stream) {
-                  var start = startTag(stream);
-                  if (start) {
-                    var rest = stream.slice(start.length);
-                    if (rest.match(new RegExp("</\\s*" + start.tagName + "\\s*>", "i"))) {
-                      var match = rest.match(new RegExp("([\\s\\S]*?)</\\s*" + start.tagName + "\\s*>", "i"));
-                      if (match) {
-                        return new _tokens.AtomicTagToken(start.tagName, match[0].length + start.length, start.attrs, start.booleanAttrs, match[1]);
-                      }
-                    }
-                  }
-                }
-                function endTag(stream) {
-                  var match = stream.match(REGEXES.endTag);
-                  if (match) {
-                    return new _tokens.EndTagToken(match[1], match[0].length);
-                  }
-                }
-              },
-              function(module3, exports3, __webpack_require__2) {
-                "use strict";
-                exports3.__esModule = true;
-                exports3.EndTagToken = exports3.AtomicTagToken = exports3.StartTagToken = exports3.TagToken = exports3.CharsToken = exports3.CommentToken = exports3.Token = void 0;
-                var _utils = __webpack_require__2(5);
-                function _classCallCheck(instance, Constructor) {
-                  if (!(instance instanceof Constructor)) {
-                    throw new TypeError("Cannot call a class as a function");
-                  }
-                }
-                var Token = exports3.Token = function Token2(type, length) {
-                  _classCallCheck(this, Token2);
-                  this.type = type;
-                  this.length = length;
-                  this.text = "";
-                };
-                var CommentToken = exports3.CommentToken = function() {
-                  function CommentToken2(content, length) {
-                    _classCallCheck(this, CommentToken2);
-                    this.type = "comment";
-                    this.length = length || (content ? content.length : 0);
-                    this.text = "";
-                    this.content = content;
-                  }
-                  CommentToken2.prototype.toString = function toString3() {
-                    return "<!--" + this.content;
-                  };
-                  return CommentToken2;
-                }();
-                var CharsToken = exports3.CharsToken = function() {
-                  function CharsToken2(length) {
-                    _classCallCheck(this, CharsToken2);
-                    this.type = "chars";
-                    this.length = length;
-                    this.text = "";
-                  }
-                  CharsToken2.prototype.toString = function toString3() {
-                    return this.text;
-                  };
-                  return CharsToken2;
-                }();
-                var TagToken = exports3.TagToken = function() {
-                  function TagToken2(type, tagName, length, attrs, booleanAttrs) {
-                    _classCallCheck(this, TagToken2);
-                    this.type = type;
-                    this.length = length;
-                    this.text = "";
-                    this.tagName = tagName;
-                    this.attrs = attrs;
-                    this.booleanAttrs = booleanAttrs;
-                    this.unary = false;
-                    this.html5Unary = false;
-                  }
-                  TagToken2.formatTag = function formatTag(tok) {
-                    var content = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : null;
-                    var str = "<" + tok.tagName;
-                    for (var key in tok.attrs) {
-                      if (tok.attrs.hasOwnProperty(key)) {
-                        str += " " + key;
-                        var val = tok.attrs[key];
-                        if (typeof tok.booleanAttrs === "undefined" || typeof tok.booleanAttrs[key] === "undefined") {
-                          str += '="' + (0, _utils.escapeQuotes)(val) + '"';
-                        }
-                      }
-                    }
-                    if (tok.rest) {
-                      str += " " + tok.rest;
-                    }
-                    if (tok.unary && !tok.html5Unary) {
-                      str += "/>";
-                    } else {
-                      str += ">";
-                    }
-                    if (content !== void 0 && content !== null) {
-                      str += content + "</" + tok.tagName + ">";
-                    }
-                    return str;
-                  };
-                  return TagToken2;
-                }();
-                var StartTagToken = exports3.StartTagToken = function() {
-                  function StartTagToken2(tagName, length, attrs, booleanAttrs, unary, rest) {
-                    _classCallCheck(this, StartTagToken2);
-                    this.type = "startTag";
-                    this.length = length;
-                    this.text = "";
-                    this.tagName = tagName;
-                    this.attrs = attrs;
-                    this.booleanAttrs = booleanAttrs;
-                    this.html5Unary = false;
-                    this.unary = unary;
-                    this.rest = rest;
-                  }
-                  StartTagToken2.prototype.toString = function toString3() {
-                    return TagToken.formatTag(this);
-                  };
-                  return StartTagToken2;
-                }();
-                var AtomicTagToken = exports3.AtomicTagToken = function() {
-                  function AtomicTagToken2(tagName, length, attrs, booleanAttrs, content) {
-                    _classCallCheck(this, AtomicTagToken2);
-                    this.type = "atomicTag";
-                    this.length = length;
-                    this.text = "";
-                    this.tagName = tagName;
-                    this.attrs = attrs;
-                    this.booleanAttrs = booleanAttrs;
-                    this.unary = false;
-                    this.html5Unary = false;
-                    this.content = content;
-                  }
-                  AtomicTagToken2.prototype.toString = function toString3() {
-                    return TagToken.formatTag(this, this.content);
-                  };
-                  return AtomicTagToken2;
-                }();
-                var EndTagToken = exports3.EndTagToken = function() {
-                  function EndTagToken2(tagName, length) {
-                    _classCallCheck(this, EndTagToken2);
-                    this.type = "endTag";
-                    this.length = length;
-                    this.text = "";
-                    this.tagName = tagName;
-                  }
-                  EndTagToken2.prototype.toString = function toString3() {
-                    return "</" + this.tagName + ">";
-                  };
-                  return EndTagToken2;
-                }();
-              },
-              function(module3, exports3) {
-                "use strict";
-                exports3.__esModule = true;
-                exports3.escapeQuotes = escapeQuotes;
-                function escapeQuotes(value) {
-                  var defaultValue = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
-                  return !value ? defaultValue : value.replace(/([^"]*)"/g, function(_, prefix) {
-                    return /\\/.test(prefix) ? prefix + '"' : prefix + '\\"';
-                  });
-                }
-              },
-              function(module3, exports3) {
-                "use strict";
-                exports3.__esModule = true;
-                exports3["default"] = fixedReadTokenFactory;
-                var EMPTY = /^(AREA|BASE|BASEFONT|BR|COL|FRAME|HR|IMG|INPUT|ISINDEX|LINK|META|PARAM|EMBED)$/i;
-                var CLOSESELF = /^(COLGROUP|DD|DT|LI|OPTIONS|P|TD|TFOOT|TH|THEAD|TR)$/i;
-                function correct(tok) {
-                  if (tok && tok.type === "startTag") {
-                    tok.unary = EMPTY.test(tok.tagName) || tok.unary;
-                    tok.html5Unary = !/\/>$/.test(tok.text);
-                  }
-                  return tok;
-                }
-                function peekToken(parser, readTokenImpl) {
-                  var tmp = parser.stream;
-                  var tok = correct(readTokenImpl());
-                  parser.stream = tmp;
-                  return tok;
-                }
-                function closeLast(parser, stack) {
-                  var tok = stack.pop();
-                  parser.prepend("</" + tok.tagName + ">");
-                }
-                function newStack() {
-                  var stack = [];
-                  stack.last = function() {
-                    return this[this.length - 1];
-                  };
-                  stack.lastTagNameEq = function(tagName) {
-                    var last = this.last();
-                    return last && last.tagName && last.tagName.toUpperCase() === tagName.toUpperCase();
-                  };
-                  stack.containsTagName = function(tagName) {
-                    for (var i = 0, tok; tok = this[i]; i++) {
-                      if (tok.tagName === tagName) {
-                        return true;
-                      }
-                    }
-                    return false;
-                  };
-                  return stack;
-                }
-                function fixedReadTokenFactory(parser, options, readTokenImpl) {
-                  var stack = newStack();
-                  var handlers = {
-                    startTag: function startTag(tok) {
-                      var tagName = tok.tagName;
-                      if (tagName.toUpperCase() === "TR" && stack.lastTagNameEq("TABLE")) {
-                        parser.prepend("<TBODY>");
-                        prepareNextToken();
-                      } else if (options.selfCloseFix && CLOSESELF.test(tagName) && stack.containsTagName(tagName)) {
-                        if (stack.lastTagNameEq(tagName)) {
-                          closeLast(parser, stack);
-                        } else {
-                          parser.prepend("</" + tok.tagName + ">");
-                          prepareNextToken();
-                        }
-                      } else if (!tok.unary) {
-                        stack.push(tok);
-                      }
-                    },
-                    endTag: function endTag(tok) {
-                      var last = stack.last();
-                      if (last) {
-                        if (options.tagSoupFix && !stack.lastTagNameEq(tok.tagName)) {
-                          closeLast(parser, stack);
-                        } else {
-                          stack.pop();
-                        }
-                      } else if (options.tagSoupFix) {
-                        readTokenImpl();
-                        prepareNextToken();
-                      }
-                    }
-                  };
-                  function prepareNextToken() {
-                    var tok = peekToken(parser, readTokenImpl);
-                    if (tok && handlers[tok.type]) {
-                      handlers[tok.type](tok);
-                    }
-                  }
-                  return function fixedReadToken() {
-                    prepareNextToken();
-                    return correct(readTokenImpl());
-                  };
-                }
-              }
-            ]);
-          });
-          ;
-        },
-        function(module2, exports2) {
-          "use strict";
-          exports2.__esModule = true;
-          var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-            return typeof obj;
-          } : function(obj) {
-            return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-          };
-          exports2.existy = existy;
-          exports2.isFunction = isFunction2;
-          exports2.each = each;
-          exports2.eachKey = eachKey;
-          exports2.defaults = defaults;
-          exports2.toArray = toArray;
-          exports2.last = last;
-          exports2.isTag = isTag;
-          exports2.isScript = isScript;
-          exports2.isStyle = isStyle;
-          function existy(thing) {
-            return thing !== void 0 && thing !== null;
-          }
-          function isFunction2(x) {
-            return typeof x === "function";
-          }
-          function each(arr, fn, target) {
-            var i = void 0;
-            var len = arr && arr.length || 0;
-            for (i = 0; i < len; i++) {
-              fn.call(target, arr[i], i);
-            }
-          }
-          function eachKey(obj, fn, target) {
-            for (var key in obj) {
-              if (obj.hasOwnProperty(key)) {
-                fn.call(target, key, obj[key]);
-              }
-            }
-          }
-          function defaults(options, _defaults) {
-            options = options || {};
-            eachKey(_defaults, function(key, val) {
-              if (!existy(options[key])) {
-                options[key] = val;
-              }
-            });
-            return options;
-          }
-          function toArray(obj) {
-            try {
-              return Array.prototype.slice.call(obj);
-            } catch (e) {
-              var _ret = function() {
-                var ret = [];
-                each(obj, function(val) {
-                  ret.push(val);
-                });
-                return {
-                  v: ret
-                };
-              }();
-              if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object")
-                return _ret.v;
-            }
-          }
-          function last(array) {
-            return array[array.length - 1];
-          }
-          function isTag(tok, tag) {
-            return !tok || !(tok.type === "startTag" || tok.type === "atomicTag") || !("tagName" in tok) ? false : !!~tok.tagName.toLowerCase().indexOf(tag);
-          }
-          function isScript(tok) {
-            return isTag(tok, "script");
-          }
-          function isStyle(tok) {
-            return isTag(tok, "style");
-          }
-        }
-      ]);
-    });
-  }
-});
-
-// node_modules/prop-types/node_modules/react-is/cjs/react-is.development.js
-var require_react_is_development = __commonJS({
-  "node_modules/prop-types/node_modules/react-is/cjs/react-is.development.js"(exports) {
-    "use strict";
-    init_react();
-    if (true) {
-      (function() {
-        "use strict";
-        var hasSymbol = typeof Symbol === "function" && Symbol.for;
-        var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 60103;
-        var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 60106;
-        var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 60107;
-        var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 60108;
-        var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 60114;
-        var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 60109;
-        var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 60110;
-        var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 60111;
-        var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 60111;
-        var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 60112;
-        var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 60113;
-        var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 60120;
-        var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 60115;
-        var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 60116;
-        var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 60121;
-        var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 60117;
-        var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 60118;
-        var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 60119;
-        function isValidElementType(type) {
-          return typeof type === "string" || typeof type === "function" || type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === "object" && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
-        }
-        function typeOf(object) {
-          if (typeof object === "object" && object !== null) {
-            var $$typeof = object.$$typeof;
-            switch ($$typeof) {
-              case REACT_ELEMENT_TYPE:
-                var type = object.type;
-                switch (type) {
-                  case REACT_ASYNC_MODE_TYPE:
-                  case REACT_CONCURRENT_MODE_TYPE:
-                  case REACT_FRAGMENT_TYPE:
-                  case REACT_PROFILER_TYPE:
-                  case REACT_STRICT_MODE_TYPE:
-                  case REACT_SUSPENSE_TYPE:
-                    return type;
-                  default:
-                    var $$typeofType = type && type.$$typeof;
-                    switch ($$typeofType) {
-                      case REACT_CONTEXT_TYPE:
-                      case REACT_FORWARD_REF_TYPE:
-                      case REACT_LAZY_TYPE:
-                      case REACT_MEMO_TYPE:
-                      case REACT_PROVIDER_TYPE:
-                        return $$typeofType;
-                      default:
-                        return $$typeof;
-                    }
-                }
-              case REACT_PORTAL_TYPE:
-                return $$typeof;
-            }
-          }
-          return void 0;
-        }
-        var AsyncMode = REACT_ASYNC_MODE_TYPE;
-        var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
-        var ContextConsumer = REACT_CONTEXT_TYPE;
-        var ContextProvider = REACT_PROVIDER_TYPE;
-        var Element2 = REACT_ELEMENT_TYPE;
-        var ForwardRef = REACT_FORWARD_REF_TYPE;
-        var Fragment3 = REACT_FRAGMENT_TYPE;
-        var Lazy = REACT_LAZY_TYPE;
-        var Memo = REACT_MEMO_TYPE;
-        var Portal = REACT_PORTAL_TYPE;
-        var Profiler = REACT_PROFILER_TYPE;
-        var StrictMode = REACT_STRICT_MODE_TYPE;
-        var Suspense = REACT_SUSPENSE_TYPE;
-        var hasWarnedAboutDeprecatedIsAsyncMode = false;
-        function isAsyncMode(object) {
-          {
-            if (!hasWarnedAboutDeprecatedIsAsyncMode) {
-              hasWarnedAboutDeprecatedIsAsyncMode = true;
-              console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
-            }
-          }
-          return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
-        }
-        function isConcurrentMode(object) {
-          return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
-        }
-        function isContextConsumer(object) {
-          return typeOf(object) === REACT_CONTEXT_TYPE;
-        }
-        function isContextProvider(object) {
-          return typeOf(object) === REACT_PROVIDER_TYPE;
-        }
-        function isElement(object) {
-          return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
-        }
-        function isForwardRef(object) {
-          return typeOf(object) === REACT_FORWARD_REF_TYPE;
-        }
-        function isFragment(object) {
-          return typeOf(object) === REACT_FRAGMENT_TYPE;
-        }
-        function isLazy(object) {
-          return typeOf(object) === REACT_LAZY_TYPE;
-        }
-        function isMemo(object) {
-          return typeOf(object) === REACT_MEMO_TYPE;
-        }
-        function isPortal(object) {
-          return typeOf(object) === REACT_PORTAL_TYPE;
-        }
-        function isProfiler(object) {
-          return typeOf(object) === REACT_PROFILER_TYPE;
-        }
-        function isStrictMode(object) {
-          return typeOf(object) === REACT_STRICT_MODE_TYPE;
-        }
-        function isSuspense(object) {
-          return typeOf(object) === REACT_SUSPENSE_TYPE;
-        }
-        exports.AsyncMode = AsyncMode;
-        exports.ConcurrentMode = ConcurrentMode;
-        exports.ContextConsumer = ContextConsumer;
-        exports.ContextProvider = ContextProvider;
-        exports.Element = Element2;
-        exports.ForwardRef = ForwardRef;
-        exports.Fragment = Fragment3;
-        exports.Lazy = Lazy;
-        exports.Memo = Memo;
-        exports.Portal = Portal;
-        exports.Profiler = Profiler;
-        exports.StrictMode = StrictMode;
-        exports.Suspense = Suspense;
-        exports.isAsyncMode = isAsyncMode;
-        exports.isConcurrentMode = isConcurrentMode;
-        exports.isContextConsumer = isContextConsumer;
-        exports.isContextProvider = isContextProvider;
-        exports.isElement = isElement;
-        exports.isForwardRef = isForwardRef;
-        exports.isFragment = isFragment;
-        exports.isLazy = isLazy;
-        exports.isMemo = isMemo;
-        exports.isPortal = isPortal;
-        exports.isProfiler = isProfiler;
-        exports.isStrictMode = isStrictMode;
-        exports.isSuspense = isSuspense;
-        exports.isValidElementType = isValidElementType;
-        exports.typeOf = typeOf;
-      })();
-    }
-  }
-});
-
-// node_modules/prop-types/node_modules/react-is/index.js
-var require_react_is = __commonJS({
-  "node_modules/prop-types/node_modules/react-is/index.js"(exports, module) {
-    "use strict";
-    init_react();
-    if (false) {
-      module.exports = null;
-    } else {
-      module.exports = require_react_is_development();
-    }
-  }
-});
-
-// node_modules/prop-types/lib/ReactPropTypesSecret.js
-var require_ReactPropTypesSecret = __commonJS({
-  "node_modules/prop-types/lib/ReactPropTypesSecret.js"(exports, module) {
-    "use strict";
-    init_react();
-    var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
-    module.exports = ReactPropTypesSecret;
-  }
-});
-
-// node_modules/prop-types/lib/has.js
-var require_has = __commonJS({
-  "node_modules/prop-types/lib/has.js"(exports, module) {
-    init_react();
-    module.exports = Function.call.bind(Object.prototype.hasOwnProperty);
-  }
-});
-
-// node_modules/prop-types/checkPropTypes.js
-var require_checkPropTypes = __commonJS({
-  "node_modules/prop-types/checkPropTypes.js"(exports, module) {
-    "use strict";
-    init_react();
-    var printWarning = function() {
-    };
-    if (true) {
-      ReactPropTypesSecret = require_ReactPropTypesSecret();
-      loggedTypeFailures = {};
-      has = require_has();
-      printWarning = function(text) {
-        var message = "Warning: " + text;
-        if (typeof console !== "undefined") {
-          console.error(message);
-        }
-        try {
-          throw new Error(message);
-        } catch (x) {
-        }
-      };
-    }
-    var ReactPropTypesSecret;
-    var loggedTypeFailures;
-    var has;
-    function checkPropTypes(typeSpecs, values, location2, componentName, getStack) {
-      if (true) {
-        for (var typeSpecName in typeSpecs) {
-          if (has(typeSpecs, typeSpecName)) {
-            var error;
-            try {
-              if (typeof typeSpecs[typeSpecName] !== "function") {
-                var err = Error((componentName || "React class") + ": " + location2 + " type `" + typeSpecName + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
-                err.name = "Invariant Violation";
-                throw err;
-              }
-              error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location2, null, ReactPropTypesSecret);
-            } catch (ex) {
-              error = ex;
-            }
-            if (error && !(error instanceof Error)) {
-              printWarning((componentName || "React class") + ": type specification of " + location2 + " `" + typeSpecName + "` is invalid; the type checker function must return `null` or an `Error` but returned a " + typeof error + ". You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).");
-            }
-            if (error instanceof Error && !(error.message in loggedTypeFailures)) {
-              loggedTypeFailures[error.message] = true;
-              var stack = getStack ? getStack() : "";
-              printWarning("Failed " + location2 + " type: " + error.message + (stack != null ? stack : ""));
-            }
-          }
-        }
-      }
-    }
-    checkPropTypes.resetWarningCache = function() {
-      if (true) {
-        loggedTypeFailures = {};
-      }
-    };
-    module.exports = checkPropTypes;
-  }
-});
-
-// node_modules/prop-types/factoryWithTypeCheckers.js
-var require_factoryWithTypeCheckers = __commonJS({
-  "node_modules/prop-types/factoryWithTypeCheckers.js"(exports, module) {
-    "use strict";
-    init_react();
-    var ReactIs = require_react_is();
-    var assign = require_object_assign();
-    var ReactPropTypesSecret = require_ReactPropTypesSecret();
-    var has = require_has();
-    var checkPropTypes = require_checkPropTypes();
-    var printWarning = function() {
-    };
-    if (true) {
-      printWarning = function(text) {
-        var message = "Warning: " + text;
-        if (typeof console !== "undefined") {
-          console.error(message);
-        }
-        try {
-          throw new Error(message);
-        } catch (x) {
-        }
-      };
-    }
-    function emptyFunctionThatReturnsNull() {
-      return null;
-    }
-    module.exports = function(isValidElement2, throwOnDirectAccess) {
-      var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
-      var FAUX_ITERATOR_SYMBOL = "@@iterator";
-      function getIteratorFn(maybeIterable) {
-        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
-        if (typeof iteratorFn === "function") {
-          return iteratorFn;
-        }
-      }
-      var ANONYMOUS = "<<anonymous>>";
-      var ReactPropTypes = {
-        array: createPrimitiveTypeChecker("array"),
-        bigint: createPrimitiveTypeChecker("bigint"),
-        bool: createPrimitiveTypeChecker("boolean"),
-        func: createPrimitiveTypeChecker("function"),
-        number: createPrimitiveTypeChecker("number"),
-        object: createPrimitiveTypeChecker("object"),
-        string: createPrimitiveTypeChecker("string"),
-        symbol: createPrimitiveTypeChecker("symbol"),
-        any: createAnyTypeChecker(),
-        arrayOf: createArrayOfTypeChecker,
-        element: createElementTypeChecker(),
-        elementType: createElementTypeTypeChecker(),
-        instanceOf: createInstanceTypeChecker,
-        node: createNodeChecker(),
-        objectOf: createObjectOfTypeChecker,
-        oneOf: createEnumTypeChecker,
-        oneOfType: createUnionTypeChecker,
-        shape: createShapeTypeChecker,
-        exact: createStrictShapeTypeChecker
-      };
-      function is(x, y) {
-        if (x === y) {
-          return x !== 0 || 1 / x === 1 / y;
-        } else {
-          return x !== x && y !== y;
-        }
-      }
-      function PropTypeError(message, data) {
-        this.message = message;
-        this.data = data && typeof data === "object" ? data : {};
-        this.stack = "";
-      }
-      PropTypeError.prototype = Error.prototype;
-      function createChainableTypeChecker(validate) {
-        if (true) {
-          var manualPropTypeCallCache = {};
-          var manualPropTypeWarningCount = 0;
-        }
-        function checkType(isRequired, props, propName, componentName, location2, propFullName, secret) {
-          componentName = componentName || ANONYMOUS;
-          propFullName = propFullName || propName;
-          if (secret !== ReactPropTypesSecret) {
-            if (throwOnDirectAccess) {
-              var err = new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types");
-              err.name = "Invariant Violation";
-              throw err;
-            } else if (typeof console !== "undefined") {
-              var cacheKey = componentName + ":" + propName;
-              if (!manualPropTypeCallCache[cacheKey] && manualPropTypeWarningCount < 3) {
-                printWarning("You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated and will throw in the standalone `prop-types` package. You may be seeing this warning due to a third-party PropTypes library. See https://fb.me/react-warning-dont-call-proptypes for details.");
-                manualPropTypeCallCache[cacheKey] = true;
-                manualPropTypeWarningCount++;
-              }
-            }
-          }
-          if (props[propName] == null) {
-            if (isRequired) {
-              if (props[propName] === null) {
-                return new PropTypeError("The " + location2 + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
-              }
-              return new PropTypeError("The " + location2 + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
-            }
-            return null;
-          } else {
-            return validate(props, propName, componentName, location2, propFullName);
-          }
-        }
-        var chainedCheckType = checkType.bind(null, false);
-        chainedCheckType.isRequired = checkType.bind(null, true);
-        return chainedCheckType;
-      }
-      function createPrimitiveTypeChecker(expectedType) {
-        function validate(props, propName, componentName, location2, propFullName, secret) {
-          var propValue = props[propName];
-          var propType = getPropType(propValue);
-          if (propType !== expectedType) {
-            var preciseType = getPreciseType(propValue);
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."), { expectedType });
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createAnyTypeChecker() {
-        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
-      }
-      function createArrayOfTypeChecker(typeChecker) {
-        function validate(props, propName, componentName, location2, propFullName) {
-          if (typeof typeChecker !== "function") {
-            return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
-          }
-          var propValue = props[propName];
-          if (!Array.isArray(propValue)) {
-            var propType = getPropType(propValue);
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
-          }
-          for (var i = 0; i < propValue.length; i++) {
-            var error = typeChecker(propValue, i, componentName, location2, propFullName + "[" + i + "]", ReactPropTypesSecret);
-            if (error instanceof Error) {
-              return error;
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createElementTypeChecker() {
-        function validate(props, propName, componentName, location2, propFullName) {
-          var propValue = props[propName];
-          if (!isValidElement2(propValue)) {
-            var propType = getPropType(propValue);
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createElementTypeTypeChecker() {
-        function validate(props, propName, componentName, location2, propFullName) {
-          var propValue = props[propName];
-          if (!ReactIs.isValidElementType(propValue)) {
-            var propType = getPropType(propValue);
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createInstanceTypeChecker(expectedClass) {
-        function validate(props, propName, componentName, location2, propFullName) {
-          if (!(props[propName] instanceof expectedClass)) {
-            var expectedClassName = expectedClass.name || ANONYMOUS;
-            var actualClassName = getClassName(props[propName]);
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createEnumTypeChecker(expectedValues) {
-        if (!Array.isArray(expectedValues)) {
-          if (true) {
-            if (arguments.length > 1) {
-              printWarning("Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).");
-            } else {
-              printWarning("Invalid argument supplied to oneOf, expected an array.");
-            }
-          }
-          return emptyFunctionThatReturnsNull;
-        }
-        function validate(props, propName, componentName, location2, propFullName) {
-          var propValue = props[propName];
-          for (var i = 0; i < expectedValues.length; i++) {
-            if (is(propValue, expectedValues[i])) {
-              return null;
-            }
-          }
-          var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
-            var type = getPreciseType(value);
-            if (type === "symbol") {
-              return String(value);
-            }
-            return value;
-          });
-          return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createObjectOfTypeChecker(typeChecker) {
-        function validate(props, propName, componentName, location2, propFullName) {
-          if (typeof typeChecker !== "function") {
-            return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
-          }
-          var propValue = props[propName];
-          var propType = getPropType(propValue);
-          if (propType !== "object") {
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
-          }
-          for (var key in propValue) {
-            if (has(propValue, key)) {
-              var error = typeChecker(propValue, key, componentName, location2, propFullName + "." + key, ReactPropTypesSecret);
-              if (error instanceof Error) {
-                return error;
-              }
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createUnionTypeChecker(arrayOfTypeCheckers) {
-        if (!Array.isArray(arrayOfTypeCheckers)) {
-          true ? printWarning("Invalid argument supplied to oneOfType, expected an instance of array.") : void 0;
-          return emptyFunctionThatReturnsNull;
-        }
-        for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
-          var checker = arrayOfTypeCheckers[i];
-          if (typeof checker !== "function") {
-            printWarning("Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + ".");
-            return emptyFunctionThatReturnsNull;
-          }
-        }
-        function validate(props, propName, componentName, location2, propFullName) {
-          var expectedTypes = [];
-          for (var i2 = 0; i2 < arrayOfTypeCheckers.length; i2++) {
-            var checker2 = arrayOfTypeCheckers[i2];
-            var checkerResult = checker2(props, propName, componentName, location2, propFullName, ReactPropTypesSecret);
-            if (checkerResult == null) {
-              return null;
-            }
-            if (checkerResult.data && has(checkerResult.data, "expectedType")) {
-              expectedTypes.push(checkerResult.data.expectedType);
-            }
-          }
-          var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
-          return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createNodeChecker() {
-        function validate(props, propName, componentName, location2, propFullName) {
-          if (!isNode(props[propName])) {
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function invalidValidatorError(componentName, location2, propFullName, key, type) {
-        return new PropTypeError((componentName || "React class") + ": " + location2 + " type `" + propFullName + "." + key + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + type + "`.");
-      }
-      function createShapeTypeChecker(shapeTypes) {
-        function validate(props, propName, componentName, location2, propFullName) {
-          var propValue = props[propName];
-          var propType = getPropType(propValue);
-          if (propType !== "object") {
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-          }
-          for (var key in shapeTypes) {
-            var checker = shapeTypes[key];
-            if (typeof checker !== "function") {
-              return invalidValidatorError(componentName, location2, propFullName, key, getPreciseType(checker));
-            }
-            var error = checker(propValue, key, componentName, location2, propFullName + "." + key, ReactPropTypesSecret);
-            if (error) {
-              return error;
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createStrictShapeTypeChecker(shapeTypes) {
-        function validate(props, propName, componentName, location2, propFullName) {
-          var propValue = props[propName];
-          var propType = getPropType(propValue);
-          if (propType !== "object") {
-            return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-          }
-          var allKeys = assign({}, props[propName], shapeTypes);
-          for (var key in allKeys) {
-            var checker = shapeTypes[key];
-            if (has(shapeTypes, key) && typeof checker !== "function") {
-              return invalidValidatorError(componentName, location2, propFullName, key, getPreciseType(checker));
-            }
-            if (!checker) {
-              return new PropTypeError("Invalid " + location2 + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`.\nBad object: " + JSON.stringify(props[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  "));
-            }
-            var error = checker(propValue, key, componentName, location2, propFullName + "." + key, ReactPropTypesSecret);
-            if (error) {
-              return error;
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function isNode(propValue) {
-        switch (typeof propValue) {
-          case "number":
-          case "string":
-          case "undefined":
-            return true;
-          case "boolean":
-            return !propValue;
-          case "object":
-            if (Array.isArray(propValue)) {
-              return propValue.every(isNode);
-            }
-            if (propValue === null || isValidElement2(propValue)) {
-              return true;
-            }
-            var iteratorFn = getIteratorFn(propValue);
-            if (iteratorFn) {
-              var iterator = iteratorFn.call(propValue);
-              var step;
-              if (iteratorFn !== propValue.entries) {
-                while (!(step = iterator.next()).done) {
-                  if (!isNode(step.value)) {
-                    return false;
-                  }
-                }
-              } else {
-                while (!(step = iterator.next()).done) {
-                  var entry2 = step.value;
-                  if (entry2) {
-                    if (!isNode(entry2[1])) {
-                      return false;
-                    }
-                  }
-                }
-              }
-            } else {
-              return false;
-            }
-            return true;
-          default:
-            return false;
-        }
-      }
-      function isSymbol(propType, propValue) {
-        if (propType === "symbol") {
-          return true;
-        }
-        if (!propValue) {
-          return false;
-        }
-        if (propValue["@@toStringTag"] === "Symbol") {
-          return true;
-        }
-        if (typeof Symbol === "function" && propValue instanceof Symbol) {
-          return true;
-        }
-        return false;
-      }
-      function getPropType(propValue) {
-        var propType = typeof propValue;
-        if (Array.isArray(propValue)) {
-          return "array";
-        }
-        if (propValue instanceof RegExp) {
-          return "object";
-        }
-        if (isSymbol(propType, propValue)) {
-          return "symbol";
-        }
-        return propType;
-      }
-      function getPreciseType(propValue) {
-        if (typeof propValue === "undefined" || propValue === null) {
-          return "" + propValue;
-        }
-        var propType = getPropType(propValue);
-        if (propType === "object") {
-          if (propValue instanceof Date) {
-            return "date";
-          } else if (propValue instanceof RegExp) {
-            return "regexp";
-          }
-        }
-        return propType;
-      }
-      function getPostfixForTypeWarning(value) {
-        var type = getPreciseType(value);
-        switch (type) {
-          case "array":
-          case "object":
-            return "an " + type;
-          case "boolean":
-          case "date":
-          case "regexp":
-            return "a " + type;
-          default:
-            return type;
-        }
-      }
-      function getClassName(propValue) {
-        if (!propValue.constructor || !propValue.constructor.name) {
-          return ANONYMOUS;
-        }
-        return propValue.constructor.name;
-      }
-      ReactPropTypes.checkPropTypes = checkPropTypes;
-      ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
-      ReactPropTypes.PropTypes = ReactPropTypes;
-      return ReactPropTypes;
-    };
-  }
-});
-
-// node_modules/prop-types/index.js
-var require_prop_types = __commonJS({
-  "node_modules/prop-types/index.js"(exports, module) {
-    init_react();
-    if (true) {
-      ReactIs = require_react_is();
-      throwOnDirectAccess = true;
-      module.exports = require_factoryWithTypeCheckers()(ReactIs.isElement, throwOnDirectAccess);
-    } else {
-      module.exports = null();
-    }
-    var ReactIs;
-    var throwOnDirectAccess;
-  }
-});
-
 // server.js
 init_react();
 
@@ -13658,13 +11819,13 @@ async function loadRouteModule(route, routeModulesCache) {
 }
 
 // node_modules/@remix-run/react/esm/links.js
-function getLinksForMatches(matches, routeModules, manifest2) {
+function getLinksForMatches(matches, routeModules, manifest) {
   let descriptors = matches.map((match) => {
     var _module$links;
     let module = routeModules[match.route.id];
     return ((_module$links = module.links) === null || _module$links === void 0 ? void 0 : _module$links.call(module)) || [];
   }).flat(1);
-  let preloads = getCurrentPageModulePreloadHrefs(matches, manifest2);
+  let preloads = getCurrentPageModulePreloadHrefs(matches, manifest);
   return dedupe(descriptors, preloads);
 }
 async function prefetchStyleLinks(routeModule) {
@@ -13712,11 +11873,11 @@ function isHtmlLinkDescriptor(object) {
   return object != null && typeof object.rel === "string" && typeof object.href === "string";
 }
 async function getStylesheetPrefetchLinks(matches, routeModules) {
-  let links2 = await Promise.all(matches.map(async (match) => {
+  let links = await Promise.all(matches.map(async (match) => {
     let mod = await loadRouteModule(match.route, routeModules);
     return mod.links ? mod.links() : [];
   }));
-  return links2.flat(1).filter(isHtmlLinkDescriptor).filter((link) => link.rel === "stylesheet" || link.rel === "preload").map((_a) => {
+  return links.flat(1).filter(isHtmlLinkDescriptor).filter((link) => link.rel === "stylesheet" || link.rel === "preload").map((_a) => {
     var _b = _a, {
       rel
     } = _b, attrs = __objRest(_b, [
@@ -13761,9 +11922,9 @@ function getNewMatchesForLinks(page, nextMatches, currentMatches, location2, mod
   });
   return newMatches;
 }
-function getDataLinkHrefs(page, matches, manifest2) {
+function getDataLinkHrefs(page, matches, manifest) {
   let path = parsePathPatch(page);
-  return dedupeHrefs(matches.filter((match) => manifest2.routes[match.route.id].hasLoader).map((match) => {
+  return dedupeHrefs(matches.filter((match) => manifest.routes[match.route.id].hasLoader).map((match) => {
     let {
       pathname,
       search
@@ -13783,9 +11944,9 @@ function getModuleLinkHrefs(matches, manifestPatch) {
     return hrefs;
   }).flat(1));
 }
-function getCurrentPageModulePreloadHrefs(matches, manifest2) {
+function getCurrentPageModulePreloadHrefs(matches, manifest) {
   return dedupeHrefs(matches.map((match) => {
-    let route = manifest2.routes[match.route.id];
+    let route = manifest.routes[match.route.id];
     let hrefs = [route.module];
     if (route.imports) {
       hrefs = hrefs.concat(route.imports);
@@ -13842,13 +12003,13 @@ function isErrorResponse(response) {
 function isRedirectResponse2(response) {
   return response instanceof Response && response.headers.get("X-Remix-Redirect") != null;
 }
-async function fetchData(url2, routeId, signal, submission) {
-  url2.searchParams.set("_data", routeId);
+async function fetchData(url, routeId, signal, submission) {
+  url.searchParams.set("_data", routeId);
   let init2 = submission ? getActionInit(submission, signal) : {
     credentials: "same-origin",
     signal
   };
-  let response = await fetch(url2.href, init2);
+  let response = await fetch(url.href, init2);
   if (isErrorResponse(response)) {
     let data = await response.json();
     let error = new Error(data.message);
@@ -14081,17 +12242,17 @@ function createTransitionManager(init2) {
       controller.abort();
     }
   }
-  function isIndexRequestUrl2(url2) {
-    for (let param of url2.searchParams.getAll("index")) {
+  function isIndexRequestUrl2(url) {
+    for (let param of url.searchParams.getAll("index")) {
       if (param === "") {
         return true;
       }
     }
     return false;
   }
-  function getFetcherRequestMatch(url2, matches2) {
+  function getFetcherRequestMatch(url, matches2) {
     let match = matches2.slice(-1)[0];
-    if (!isIndexRequestUrl2(url2) && match.route.index) {
+    if (!isIndexRequestUrl2(url) && match.route.index) {
       return matches2.slice(-2)[0];
     }
     return match;
@@ -14161,14 +12322,14 @@ function createTransitionManager(init2) {
     }
     fetchReloadIds.delete(key);
     fetchControllers.delete(key);
-    let redirect3 = findRedirect(results);
-    if (redirect3) {
+    let redirect2 = findRedirect(results);
+    if (redirect2) {
       let locationState = {
         isRedirect: true,
         type: "loader",
-        setCookie: redirect3.setCookie
+        setCookie: redirect2.setCookie
       };
-      init2.onRedirect(redirect3.location, locationState);
+      init2.onRedirect(redirect2.location, locationState);
       return;
     }
     let [error, errorBoundaryId] = findErrorAndBoundaryId(results, state.matches, maybeActionErrorResult);
@@ -14569,29 +12730,29 @@ function createTransitionManager(init2) {
     if (controller.signal.aborted) {
       return;
     }
-    let redirect3 = findRedirect(results);
-    if (redirect3) {
+    let redirect2 = findRedirect(results);
+    if (redirect2) {
       if (state.transition.type === "actionReload") {
         let locationState = {
           isRedirect: true,
           type: "action",
-          setCookie: redirect3.setCookie
+          setCookie: redirect2.setCookie
         };
-        init2.onRedirect(redirect3.location, locationState);
+        init2.onRedirect(redirect2.location, locationState);
       } else if (state.transition.type === "loaderSubmission") {
         let locationState = {
           isRedirect: true,
           type: "loaderSubmission",
-          setCookie: redirect3.setCookie
+          setCookie: redirect2.setCookie
         };
-        init2.onRedirect(redirect3.location, locationState);
+        init2.onRedirect(redirect2.location, locationState);
       } else {
         let locationState = {
           isRedirect: true,
           type: "loader",
-          setCookie: redirect3.setCookie
+          setCookie: redirect2.setCookie
         };
-        init2.onRedirect(redirect3.location, locationState);
+        init2.onRedirect(redirect2.location, locationState);
       }
       return;
     }
@@ -14650,11 +12811,11 @@ function createTransitionManager(init2) {
   };
 }
 async function callLoaders(state, location2, matches, signal, actionErrorResult, actionCatchResult, submission, submissionRouteId, fetcher, catchBoundaryId) {
-  let url2 = createUrl(createHref(location2));
+  let url = createUrl(createHref(location2));
   let matchesToLoad = filterMatchesToLoad(state, location2, matches, actionErrorResult, actionCatchResult, submission, submissionRouteId, fetcher, catchBoundaryId);
-  return Promise.all(matchesToLoad.map((match) => callLoader(match, url2, signal)));
+  return Promise.all(matchesToLoad.map((match) => callLoader(match, url, signal)));
 }
-async function callLoader(match, url2, signal) {
+async function callLoader(match, url, signal) {
   invariant2(match.route.loader, `Expected loader for ${match.route.id}`);
   try {
     let {
@@ -14662,7 +12823,7 @@ async function callLoader(match, url2, signal) {
     } = match;
     let value = await match.route.loader({
       params,
-      url: url2,
+      url,
       signal
     });
     return {
@@ -14719,7 +12880,7 @@ function filterMatchesToLoad(state, location2, matches, actionErrorResult, actio
     var _state$matches$index$;
     return state.matches[index].pathname !== match.pathname || ((_state$matches$index$ = state.matches[index].route.path) === null || _state$matches$index$ === void 0 ? void 0 : _state$matches$index$.endsWith("*")) && state.matches[index].params["*"] !== match.params["*"];
   };
-  let url2 = createUrl(createHref(location2));
+  let url = createUrl(createHref(location2));
   let filterByRouteProps = (match, index) => {
     if (!match.route.loader) {
       return false;
@@ -14731,7 +12892,7 @@ function filterMatchesToLoad(state, location2, matches, actionErrorResult, actio
       let prevUrl = createUrl(createHref(state.location));
       return match.route.shouldReload({
         prevUrl,
-        url: url2,
+        url,
         submission,
         params: match.params
       });
@@ -14744,7 +12905,7 @@ function filterMatchesToLoad(state, location2, matches, actionErrorResult, actio
   }
   if ((fetcher === null || fetcher === void 0 ? void 0 : fetcher.type) === "actionReload") {
     return matches.filter(filterByRouteProps);
-  } else if (state.transition.type === "actionReload" || state.transition.type === "actionRedirect" || state.transition.type === "fetchActionRedirect" || createHref(url2) === createHref(state.location) || url2.searchParams.toString() !== state.location.search.substring(1) || (_location$state = location2.state) !== null && _location$state !== void 0 && _location$state.setCookie) {
+  } else if (state.transition.type === "actionReload" || state.transition.type === "actionRedirect" || state.transition.type === "fetchActionRedirect" || createHref(url) === createHref(state.location) || url.searchParams.toString() !== state.location.search.substring(1) || (_location$state = location2.state) !== null && _location$state !== void 0 && _location$state.setCookie) {
     return matches.filter(filterByRouteProps);
   }
   return matches.filter((match, index, arr) => {
@@ -14912,18 +13073,18 @@ async function loadRouteModuleWithBlockingLinks(route, routeModules) {
   return routeModule;
 }
 function createLoader(route, routeModules) {
-  let loader8 = async ({
-    url: url2,
+  let loader = async ({
+    url,
     signal,
     submission
   }) => {
     if (route.hasLoader) {
-      let [result] = await Promise.all([fetchData(url2, route.id, signal, submission), loadRouteModuleWithBlockingLinks(route, routeModules)]);
+      let [result] = await Promise.all([fetchData(url, route.id, signal, submission), loadRouteModuleWithBlockingLinks(route, routeModules)]);
       if (result instanceof Error)
         throw result;
-      let redirect3 = await checkRedirect(result);
-      if (redirect3)
-        return redirect3;
+      let redirect2 = await checkRedirect(result);
+      if (redirect2)
+        return redirect2;
       if (isCatchResponse2(result)) {
         throw new CatchValue(result.status, result.statusText, await extractData2(result.clone()));
       }
@@ -14932,24 +13093,24 @@ function createLoader(route, routeModules) {
       await loadRouteModuleWithBlockingLinks(route, routeModules);
     }
   };
-  return loader8;
+  return loader;
 }
 function createAction(route, routeModules) {
   let action = async ({
-    url: url2,
+    url,
     signal,
     submission
   }) => {
     if (!route.hasAction) {
       console.error(`Route "${route.id}" does not have an action, but you are trying to submit to it. To fix this, please add an \`action\` function to the route`);
     }
-    let result = await fetchData(url2, route.id, signal, submission);
+    let result = await fetchData(url, route.id, signal, submission);
     if (result instanceof Error) {
       throw result;
     }
-    let redirect3 = await checkRedirect(result);
-    if (redirect3)
-      return redirect3;
+    let redirect2 = await checkRedirect(result);
+    if (redirect2)
+      return redirect2;
     await loadRouteModuleWithBlockingLinks(route, routeModules);
     if (isCatchResponse2(result)) {
       throw new CatchValue(result.status, result.statusText, await extractData2(result.clone()));
@@ -14960,13 +13121,13 @@ function createAction(route, routeModules) {
 }
 async function checkRedirect(response) {
   if (isRedirectResponse2(response)) {
-    let url2 = new URL(response.headers.get("X-Remix-Redirect"), window.location.origin);
-    if (url2.origin !== window.location.origin) {
+    let url = new URL(response.headers.get("X-Remix-Redirect"), window.location.origin);
+    if (url.origin !== window.location.origin) {
       await new Promise(() => {
-        window.location.replace(url2.href);
+        window.location.replace(url.href);
       });
     } else {
-      return new TransitionRedirect(url2.pathname + url2.search + url2.hash, response.headers.get("X-Remix-Revalidate") !== null);
+      return new TransitionRedirect(url.pathname + url.search + url.hash, response.headers.get("X-Remix-Revalidate") !== null);
     }
   }
   return null;
@@ -14987,14 +13148,14 @@ function RemixEntry({
   static: staticProp = false
 }) {
   let {
-    manifest: manifest2,
+    manifest,
     routeData: documentLoaderData,
     actionData: documentActionData,
     routeModules,
     serverHandoffString,
     appState: entryComponentDidCatchEmulator
   } = entryContext;
-  let clientRoutes = React3.useMemo(() => createClientRoutes(manifest2.routes, routeModules, RemixRoute), [manifest2, routeModules]);
+  let clientRoutes = React3.useMemo(() => createClientRoutes(manifest.routes, routeModules, RemixRoute), [manifest, routeModules]);
   let [clientState, setClientState] = React3.useState(entryComponentDidCatchEmulator);
   let [transitionManager] = React3.useState(() => {
     return createTransitionManager({
@@ -15050,7 +13211,7 @@ function RemixEntry({
   return /* @__PURE__ */ React3.createElement(RemixEntryContext.Provider, {
     value: {
       matches,
-      manifest: manifest2,
+      manifest,
       appState: clientState,
       routeModules,
       serverHandoffString,
@@ -15259,10 +13420,10 @@ function Links() {
   let {
     matches,
     routeModules,
-    manifest: manifest2
+    manifest
   } = useRemixEntryContext();
-  let links2 = React3.useMemo(() => getLinksForMatches(matches, routeModules, manifest2), [matches, routeModules, manifest2]);
-  return /* @__PURE__ */ React3.createElement(React3.Fragment, null, links2.map((link) => isPageLinkDescriptor(link) ? /* @__PURE__ */ React3.createElement(PrefetchPageLinks, _extends3({
+  let links = React3.useMemo(() => getLinksForMatches(matches, routeModules, manifest), [matches, routeModules, manifest]);
+  return /* @__PURE__ */ React3.createElement(React3.Fragment, null, links.map((link) => isPageLinkDescriptor(link) ? /* @__PURE__ */ React3.createElement(PrefetchPageLinks, _extends3({
     key: link.page
   }, link)) : /* @__PURE__ */ React3.createElement("link", _extends3({
     key: link.rel + link.href
@@ -15294,9 +13455,9 @@ function usePrefetchedStylesheets(matches) {
   let [styleLinks, setStyleLinks] = React3.useState([]);
   React3.useEffect(() => {
     let interrupted = false;
-    getStylesheetPrefetchLinks(matches, routeModules).then((links2) => {
+    getStylesheetPrefetchLinks(matches, routeModules).then((links) => {
       if (!interrupted)
-        setStyleLinks(links2);
+        setStyleLinks(links);
     });
     return () => {
       interrupted = true;
@@ -15315,12 +13476,12 @@ function PrefetchPageLinksImpl(_a) {
   let location2 = useLocation();
   let {
     matches,
-    manifest: manifest2
+    manifest
   } = useRemixEntryContext();
   let newMatchesForData = React3.useMemo(() => getNewMatchesForLinks(page, nextMatches, matches, location2, "data"), [page, nextMatches, matches, location2]);
   let newMatchesForAssets = React3.useMemo(() => getNewMatchesForLinks(page, nextMatches, matches, location2, "assets"), [page, nextMatches, matches, location2]);
-  let dataHrefs = React3.useMemo(() => getDataLinkHrefs(page, newMatchesForData, manifest2), [newMatchesForData, page, manifest2]);
-  let moduleHrefs = React3.useMemo(() => getModuleLinkHrefs(newMatchesForAssets, manifest2), [newMatchesForAssets, manifest2]);
+  let dataHrefs = React3.useMemo(() => getDataLinkHrefs(page, newMatchesForData, manifest), [newMatchesForData, page, manifest]);
+  let moduleHrefs = React3.useMemo(() => getModuleLinkHrefs(newMatchesForAssets, manifest), [newMatchesForAssets, manifest]);
   let styleLinks = usePrefetchedStylesheets(newMatchesForAssets);
   return /* @__PURE__ */ React3.createElement(React3.Fragment, null, dataHrefs.map((href) => /* @__PURE__ */ React3.createElement("link", _extends3({
     key: href,
@@ -15342,7 +13503,7 @@ function Meta() {
     routeModules
   } = useRemixEntryContext();
   let location2 = useLocation();
-  let meta5 = {};
+  let meta2 = {};
   let parentsData = {};
   for (let match of matches) {
     let routeId = match.route.id;
@@ -15356,11 +13517,11 @@ function Meta() {
         params,
         location: location2
       }) : routeModule.meta;
-      Object.assign(meta5, routeMeta);
+      Object.assign(meta2, routeMeta);
     }
     parentsData[routeId] = data;
   }
-  return /* @__PURE__ */ React3.createElement(React3.Fragment, null, Object.entries(meta5).map(([name, value]) => {
+  return /* @__PURE__ */ React3.createElement(React3.Fragment, null, Object.entries(meta2).map(([name, value]) => {
     if (!value) {
       return null;
     }
@@ -15400,7 +13561,7 @@ function Meta() {
 var isHydrated = false;
 function Scripts(props) {
   let {
-    manifest: manifest2,
+    manifest,
     matches,
     pendingLocation,
     clientRoutes,
@@ -15411,18 +13572,18 @@ function Scripts(props) {
   }, []);
   let initialScripts = React3.useMemo(() => {
     let contextScript = serverHandoffString ? `window.__remixContext = ${serverHandoffString};` : "";
-    let routeModulesScript = `${matches.map((match, index) => `import * as route${index} from ${JSON.stringify(manifest2.routes[match.route.id].module)};`).join("\n")}
+    let routeModulesScript = `${matches.map((match, index) => `import * as route${index} from ${JSON.stringify(manifest.routes[match.route.id].module)};`).join("\n")}
 window.__remixRouteModules = {${matches.map((match, index) => `${JSON.stringify(match.route.id)}:route${index}`).join(",")}};`;
     return /* @__PURE__ */ React3.createElement(React3.Fragment, null, /* @__PURE__ */ React3.createElement("script", _extends3({}, props, {
       suppressHydrationWarning: true,
       dangerouslySetInnerHTML: createHtml(contextScript)
     })), /* @__PURE__ */ React3.createElement("script", _extends3({}, props, {
-      src: manifest2.url
+      src: manifest.url
     })), /* @__PURE__ */ React3.createElement("script", _extends3({}, props, {
       dangerouslySetInnerHTML: createHtml(routeModulesScript),
       type: "module"
     })), /* @__PURE__ */ React3.createElement("script", _extends3({}, props, {
-      src: manifest2.entry.module,
+      src: manifest.entry.module,
       type: "module"
     })));
   }, []);
@@ -15435,10 +13596,10 @@ window.__remixRouteModules = {${matches.map((match, index) => `${JSON.stringify(
     return [];
   }, [pendingLocation, clientRoutes]);
   let routePreloads = matches.concat(nextMatches).map((match) => {
-    let route = manifest2.routes[match.route.id];
+    let route = manifest.routes[match.route.id];
     return (route.imports || []).concat([route.module]);
   }).flat(1);
-  let preloads = manifest2.entry.imports.concat(routePreloads);
+  let preloads = manifest.entry.imports.concat(routePreloads);
   return /* @__PURE__ */ React3.createElement(React3.Fragment, null, dedupe2(preloads).map((path) => /* @__PURE__ */ React3.createElement("link", {
     key: path,
     rel: "modulepreload",
@@ -15590,11 +13751,11 @@ function useSubmitImpl(key) {
       protocol,
       host
     } = window.location;
-    let url2 = new URL(action, `${protocol}//${host}`);
+    let url = new URL(action, `${protocol}//${host}`);
     if (method.toLowerCase() === "get") {
       for (let [name, value] of formData) {
         if (typeof value === "string") {
-          url2.searchParams.append(name, value);
+          url.searchParams.append(name, value);
         } else {
           throw new Error(`Cannot submit binary form data using GET`);
         }
@@ -15602,7 +13763,7 @@ function useSubmitImpl(key) {
     }
     let submission = {
       formData,
-      action: url2.pathname + url2.search,
+      action: url.pathname + url.search,
       method: method.toUpperCase(),
       encType,
       key: Math.random().toString(36).substr(2, 8)
@@ -15616,7 +13777,7 @@ function useSubmitImpl(key) {
       });
     } else {
       setNextNavigationSubmission(submission);
-      navigate(url2.pathname + url2.search, {
+      navigate(url.pathname + url.search, {
         replace: options.replace
       });
     }
@@ -15651,15 +13812,45 @@ function useBeforeUnload(callback) {
     };
   }, [callback]);
 }
-function useLoaderData() {
-  return useRemixRouteContext().data;
-}
 function useTransition() {
   let {
     transitionManager
   } = useRemixEntryContext();
   return transitionManager.getState().transition;
 }
+var liveReloadMounted = false;
+var LiveReload = false ? () => null : function LiveReload2({
+  port = Number(61358),
+  nonce = void 0
+}) {
+  let setupLiveReload = (port2) => {
+    let protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    let host = location.hostname;
+    let socketPath = `${protocol}//${host}:${port2}/socket`;
+    let ws = new WebSocket(socketPath);
+    ws.onmessage = (message) => {
+      let event = JSON.parse(message.data);
+      if (event.type === "LOG") {
+        console.log(event.message);
+      }
+      if (event.type === "RELOAD") {
+        console.log("\u{1F4BF} Reloading window ...");
+        window.location.reload();
+      }
+    };
+    ws.onerror = (error) => {
+      console.log("Remix dev asset server web socket error:");
+      console.error(error);
+    };
+  };
+  React3.useEffect(() => {
+    if (!liveReloadMounted) {
+      setupLiveReload(port);
+      liveReloadMounted = true;
+    }
+  }, []);
+  return null;
+};
 function useComposedRefs(...refs) {
   return React3.useCallback((node) => {
     for (let ref of refs) {
@@ -15784,14 +13975,14 @@ init_history();
 var React5 = __toESM(require_react());
 function RemixServer({
   context,
-  url: url2
+  url
 }) {
-  if (typeof url2 === "string") {
-    url2 = new URL(url2);
+  if (typeof url === "string") {
+    url = new URL(url);
   }
   let location2 = {
-    pathname: url2.pathname,
-    search: url2.search,
+    pathname: url.pathname,
+    search: url.search,
     hash: "",
     state: null,
     key: "default"
@@ -15846,678 +14037,47 @@ function handleRequest(request, responseStatusCode, responseHeaders, remixContex
 var root_exports = {};
 __export(root_exports, {
   default: () => App,
-  links: () => links,
-  loader: () => loader,
   meta: () => meta
 });
 init_react();
-
-// app/http.js
-init_react();
-var import_cloudflare2 = __toESM(require_cloudflare());
-function addTrailingSlash(url2) {
-  if (url2.pathname !== "/" && !url2.pathname.endsWith("/") && !url2.pathname.includes(".") && !url2.pathname.includes("?")) {
-    throw (0, import_cloudflare2.redirect)(`${url2.pathname}/`, {
-      status: 308
-    });
-  }
-}
-
-// app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-FOW2CCTG.css";
-
-// app/config.json
-var title2 = "Hello world";
-var description = "This is a description";
-var author = "Dewynters - Simon Richards";
-var url = "https://domain.coms";
-var manifest = {
-  name: "Dewynters",
-  short_name: "Dewynters",
-  icons: [
-    {
-      src: "/android-chrome-192x192.png",
-      sizes: "192x192",
-      type: "image/png"
-    },
-    {
-      src: "/android-chrome-512x512.png",
-      sizes: "512x512",
-      type: "image/png"
-    }
-  ],
-  theme_color: "#A9ADC1",
-  background_color: "#1f2028"
-};
-var GTM_ID = "GTM-58C3HCB";
-var config_default = {
-  title: title2,
-  description,
-  author,
-  url,
-  manifest,
-  GTM_ID
-};
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/root.jsx
-var import_react6 = __toESM(require_react());
-var links = () => [
-  {
-    rel: "apple-touch-icon",
-    sizes: "180x180",
-    href: "/apple-touch-icon.png"
-  },
-  {
-    rel: "icon",
-    type: "image/png",
-    sizes: "32x32",
-    href: "/favicon-32x32.png"
-  },
-  {
-    rel: "icon",
-    type: "image/png",
-    sizes: "16x16",
-    href: "/favicon-16x16.png"
-  },
-  { rel: "manifest", href: "/site.webmanifest" },
-  { rel: "mask-icon", href: "/safari-pinned-tab.svg", color: "#000000" },
-  { rel: "icon", href: "/favicon.ico" },
-  { rel: "stylesheet", href: tailwind_default },
-  { rel: "sitemap", href: "/sitemap.xml", type: "application/xml" }
-];
 var meta = () => ({
   charset: "utf-8",
-  refresh: {
-    httpEquiv: "x-ua-compatible",
-    content: "ie=edge"
-  },
-  viewport: "width=device-width, initial-scale=1, shrink-to-fit=no",
-  "msapplication-TileColor": "#000000",
-  "theme-color": "#ffffff"
+  title: "New Remix App",
+  viewport: "width=device-width,initial-scale=1"
 });
-var loader = async ({ request }) => {
-  const url2 = new URL(request.url);
-  addTrailingSlash(url2);
-  let canonical = url2.href;
-  return canonical;
-};
 function App() {
-  const canonical = useLoaderData();
-  (0, import_react6.useEffect)(() => {
-    if (config_default.GTM_ID) {
-      const postscribe = require_postscribe();
-      postscribe(document.head, `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','${config_default.GTM_ID}');<\/script>`);
-    }
-  });
   return /* @__PURE__ */ React.createElement("html", {
     lang: "en"
-  }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(Meta, null), !!canonical && /* @__PURE__ */ React.createElement("link", {
-    rel: "canonical",
-    href: canonical
-  }), /* @__PURE__ */ React.createElement(Links, null)), /* @__PURE__ */ React.createElement("body", null, config_default.GTM_ID && /* @__PURE__ */ React.createElement("noscript", null, /* @__PURE__ */ React.createElement("iframe", {
-    src: `https://www.googletagmanager.com/ns.html?id=${config_default.GTM_ID}`,
-    height: "0",
-    width: "0",
-    style: { display: "none", visibility: "hidden" }
-  })), /* @__PURE__ */ React.createElement(Outlet, null), /* @__PURE__ */ React.createElement(ScrollRestoration, null), /* @__PURE__ */ React.createElement(Scripts, null)));
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/site[.webmanifest].jsx
-var site_webmanifest_exports = {};
-__export(site_webmanifest_exports, {
-  loader: () => loader2
-});
-init_react();
-async function loader2() {
-  const { manifest: manifest2 } = config_default;
-  const json5 = `
-  {
-    "name": "${manifest2.name}",
-    "short_name": "${manifest2.short_name}",
-    "start_url": "/",
-    "icons": [${manifest2.icons.map((icon) => {
-    return JSON.stringify(icon);
-  })}],
-    "theme_color": "${manifest2.theme_color}",
-    "background_color": "${manifest2.background_color}",
-    "display": "minimal-ui"
-  }`;
-  return new Response(json5, {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/sitemap[.xml].jsx
-var sitemap_xml_exports = {};
-__export(sitemap_xml_exports, {
-  loader: () => loader3
-});
-init_react();
-
-// app/models/pages.server.js
-init_react();
-
-// app/client.server.js
-init_react();
-async function createNewClient(query5, variables = {}, auth = false) {
-  let wpAuthorization;
-  const endpoint = "https://cms.dewynters-aws.co.uk/graphql";
-  const req = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      authorization: auth ? `Basic ${wpAuthorization}` : ""
-    },
-    body: JSON.stringify({
-      query: query5,
-      variables
-    })
-  }).then((res) => res.json());
-  return req;
-}
-
-// app/models/pages.server.js
-var query = `
-  query PAGES {
-    pages {
-      edges {
-        node {
-          id
-          uri
-          modified
-        }
-      }
-    }
-  }
-`;
-async function getPages() {
-  const pages = await createNewClient(query);
-  console.log(pages);
-  return pages;
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/sitemap[.xml].jsx
-async function loader3() {
-  const { pages } = await getPages();
-  function getEntry(node) {
-    return `
-    <url>
-      <loc>${process.env.FRONTEND_URL}${node.uri}</loc>
-      <lastmod>${node.modified}</lastmod>
-      <changefreq>daily</changefreq>
-      <priority>${node.uri === "/" ? "1.0" : "0.7"}</priority>
-    </url>
-    `.trim();
-  }
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-      <urlset
-        xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
-      >
-        ${pages.edges.map(({ node }) => getEntry(node)).join("")}
-    </urlset>`;
-  return new Response(xml, {
-    status: 200,
-    headers: {
-      "Content-Type": "application/xml"
-    }
-  });
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/robots[.txt].jsx
-var robots_txt_exports = {};
-__export(robots_txt_exports, {
-  loader: () => loader4
-});
-init_react();
-async function loader4() {
-  const live = false;
-  const text = `
-User-agent: *
-${live ? "Allow: /" : "Disallow: /"}
-Sitemap: ${process.env.FRONTEND_URL}/sitemap.xml
-Host: ${process.env.FRONTEND_URL}
-  `.trim();
-  return new Response(text, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/plain"
-    }
-  });
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/preview.jsx
-var preview_exports = {};
-__export(preview_exports, {
-  default: () => Preview,
-  loader: () => loader5,
-  meta: () => meta2
-});
-init_react();
-var import_cloudflare3 = __toESM(require_cloudflare());
-
-// app/models/preview.server.js
-init_react();
-
-// app/utils/helpers.js
-init_react();
-function error404() {
-  throw new Response("Not Found", {
-    status: 404
-  });
-}
-function error401() {
-  throw new Response("Unauthorized", {
-    status: 401
-  });
-}
-function formatHeirarchialMenu(data = [], { idKey = "id", parentKey = "parentId", childrenKey = "children" } = {}) {
-  const tree = [];
-  const childrenOf = {};
-  data.forEach((item) => {
-    const newItem = __spreadValues({}, item);
-    const { [idKey]: id, [parentKey]: parentId = 0 } = newItem;
-    childrenOf[id] = childrenOf[id] || [];
-    newItem[childrenKey] = childrenOf[id];
-    parentId ? (childrenOf[parentId] = childrenOf[parentId] || []).push(newItem) : tree.push(newItem);
-  });
-  return tree;
-}
-
-// app/models/query-partials/query-page.js
-init_react();
-var defaultPageFields = `
-	title
-	uri
-	date
-	content
-	seo {
-		title
-		metaDesc
-		opengraphImage {
-			sourceUrl
-		}
-		breadcrumbs {
-			text
-			url
-		}
-		canonical
-	}
-	acfFlexibleContent {
-		blocks {
-			__typename
-			... on Page_Acfflexiblecontent_Blocks_Hero {
-				title
-				desktopImage {
-					altText
-					mediaItemUrl
-					mediaDetails {
-						height
-						width
-					}
-					srcSet
-				}
-			}
-			... on Page_Acfflexiblecontent_Blocks_TextFullWidth {
-				text
-			}
-		}
-	}
-`;
-var query_page_default = defaultPageFields;
-
-// app/models/preview.server.js
-var query2 = `
-  query PAGE($pageId: ID!) {
-    page(idType: DATABASE_ID, id: $pageId, asPreview: true) {
-      ${query_page_default}
-    }
-  }
-`;
-async function getPreviewPage(pageId, secret) {
-  if (!pageId || !process.env.WORDPRESS_PREVIEW_SECRET || secret !== process.env.WORDPRESS_PREVIEW_SECRET) {
-    error401();
-  }
-  const { page } = await createNewClient(query2, { pageId }, true);
-  if (!page)
-    error404();
-  return page;
-}
-
-// app/utils/seo.js
-init_react();
-function Seo(data) {
-  const {
-    title: title3,
-    metaDesc,
-    metaKeywords
-  } = data.page.seo;
-  const {
-    canonical
-  } = data;
-  const metaTitle = title3 || config_default.title;
-  const metaDescription = metaDesc || config_default.description;
-  return {
-    title: metaTitle,
-    description: metaDescription,
-    keywords: metaKeywords,
-    "og:title": metaTitle,
-    "og:description": metaDescription,
-    "og:url": canonical,
-    "og:type": "website",
-    "twitter:card": "summary",
-    "twitter:creator": "Dewynters",
-    "twitter:title": metaTitle,
-    "twitter:description": metaDescription
-  };
-}
-
-// app/components/templates/PageTemplate.jsx
-init_react();
-
-// app/components/Layout/index.jsx
-init_react();
-
-// app/components/Layout/Layout.jsx
-init_react();
-
-// app/components/Header/index.jsx
-init_react();
-
-// app/components/Header/Header.jsx
-init_react();
-
-// app/components/Navigation/index.jsx
-init_react();
-
-// app/components/Navigation/Navigation.jsx
-init_react();
-var import_prop_types = __toESM(require_prop_types());
-function Arrow() {
-  return /* @__PURE__ */ React.createElement("span", {
-    role: "button",
-    "aria-label": "expand the dropdown menu"
-  }, /* @__PURE__ */ React.createElement("svg", {
-    xmlns: "http://www.w3.org/2000/svg",
-    width: "10",
-    height: "10",
-    viewBox: "0 0 24 24"
-  }, /* @__PURE__ */ React.createElement("path", {
-    d: "M6 0l12 12-12 12z"
-  })));
-}
-function NavigationMenu({ menu }) {
-  if (!menu || !(menu == null ? void 0 : menu.length)) {
-    return null;
-  }
-  const activeStyle = {
-    textDecoration: "underline"
-  };
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, menu.map((item) => {
-    const children = item.children && item.children.length > 0 ? item.children : "";
-    return /* @__PURE__ */ React.createElement("li", {
-      key: item.id
-    }, item.path.charAt(0) === "/" ? /* @__PURE__ */ React.createElement(NavLink2, {
-      to: item.path,
-      target: item.target ? item.target : "_self",
-      style: ({ isActive }) => isActive ? activeStyle : void 0,
-      className: "flex px-3 py-2 text-slate-700 hover:text-slate-900"
-    }, item.label, children && (children == null ? void 0 : children.length) && /* @__PURE__ */ React.createElement(Arrow, null)) : /* @__PURE__ */ React.createElement("a", {
-      href: item.path,
-      target: item.target,
-      rel: item.target === "_blank" ? "noopener noreferrer" : null,
-      className: "flex px-3 py-2 text-slate-700 font-medium hover:text-slate-900"
-    }, item.label), !!children && !!children.length && /* @__PURE__ */ React.createElement("ul", null, /* @__PURE__ */ React.createElement(NavigationMenu, {
-      menu: children
-    })));
-  }));
-}
-NavigationMenu.propTypes = {
-  menu: import_prop_types.default.arrayOf(import_prop_types.default.object)
-};
-function Navigation({ menu }) {
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, !!(menu == null ? void 0 : menu.length) && /* @__PURE__ */ React.createElement("ul", {
-    className: "flex space-x-4"
-  }, /* @__PURE__ */ React.createElement(NavigationMenu, {
-    menu
-  })));
-}
-Navigation.propTypes = {
-  className: import_prop_types.default.string,
-  menu: import_prop_types.default.arrayOf(import_prop_types.default.object)
-};
-
-// app/components/Header/Header.jsx
-function Header(props) {
-  const menu = formatHeirarchialMenu(props.menu.menuItems.nodes);
-  return /* @__PURE__ */ React.createElement("header", {
-    className: "p-6 bg-slate-100 flex justify-between items-center"
-  }, /* @__PURE__ */ React.createElement(Link2, {
-    to: "/"
-  }, "Remix template"), /* @__PURE__ */ React.createElement(Navigation, {
-    menu
-  }));
-}
-
-// app/components/Footer/index.jsx
-init_react();
-
-// app/components/Footer/Footer.jsx
-init_react();
-function Footer() {
-  return /* @__PURE__ */ React.createElement("footer", {
-    className: "py-5"
-  }, "Footer here");
-}
-
-// app/components/Layout/Layout.jsx
-function Layout({ menu, children }) {
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Header, {
-    menu
-  }), /* @__PURE__ */ React.createElement("main", null, children), /* @__PURE__ */ React.createElement(Footer, null));
-}
-
-// app/components/FlexibleContent/FlexibleContent.js
-init_react();
-
-// app/components/FlexibleContent/blocks/Hero.jsx
-init_react();
-var Hero = (props) => {
-  const {
-    title: title3,
-    desktopImage
-  } = props.data;
-  return /* @__PURE__ */ React.createElement("div", {
-    className: "container"
-  }, desktopImage && /* @__PURE__ */ React.createElement("img", {
-    src: desktopImage.mediaItemUrl,
-    alt: desktopImage.altText,
-    width: desktopImage.mediaDetails.width,
-    height: desktopImage.mediaDetails.height
-  }));
-};
-var Hero_default = Hero;
-
-// app/components/FlexibleContent/blocks/TextBlock.jsx
-init_react();
-var TextBlock = (props) => {
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", {
-    dangerouslySetInnerHTML: { __html: props.data.text }
-  }));
-};
-var TextBlock_default = TextBlock;
-
-// app/components/FlexibleContent/FlexibleContent.js
-function FlexibleContent({ blocks }) {
-  if (blocks) {
-    return blocks.map((block, i) => {
-      switch (block.__typename) {
-        case "Page_Acfflexiblecontent_Blocks_Hero":
-          return /* @__PURE__ */ React.createElement(Hero_default, {
-            data: block,
-            key: i
-          });
-        case "Page_Acfflexiblecontent_Blocks_TextFullWidth":
-          return /* @__PURE__ */ React.createElement(TextBlock_default, {
-            data: block,
-            key: i
-          });
-        default:
-          return /* @__PURE__ */ React.createElement("pre", {
-            key: i
-          }, JSON.stringify(block, null, 2));
-      }
-    });
-  } else
-    return null;
-}
-
-// app/components/templates/PageTemplate.jsx
-function Page({ data }) {
-  var _a;
-  const { menu, page } = data;
-  return /* @__PURE__ */ React.createElement(Layout, {
-    menu
-  }, /* @__PURE__ */ React.createElement("h1", {
-    className: "text-4xl py-4"
-  }, "Page title: ", page.title), /* @__PURE__ */ React.createElement(FlexibleContent, {
-    blocks: (_a = page.acfFlexibleContent) == null ? void 0 : _a.blocks
-  }));
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/preview.jsx
-var meta2 = ({ data }) => {
-  return Seo(data);
-};
-var loader5 = async ({ request }) => {
-  const url2 = new URL(request.url);
-  const pageId = url2.searchParams.get("page_id");
-  const secret = url2.searchParams.get("secret");
-  const page = await getPreviewPage(pageId, secret);
-  return (0, import_cloudflare3.json)({ page });
-};
-function Preview() {
-  const { page } = useLoaderData();
-  return /* @__PURE__ */ React.createElement(Page, {
-    data: page
-  });
+  }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(Meta, null), /* @__PURE__ */ React.createElement(Links, null)), /* @__PURE__ */ React.createElement("body", null, /* @__PURE__ */ React.createElement(Outlet, null), /* @__PURE__ */ React.createElement(ScrollRestoration, null), /* @__PURE__ */ React.createElement(Scripts, null), /* @__PURE__ */ React.createElement(LiveReload, null)));
 }
 
 // route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/index.jsx
 var routes_exports = {};
 __export(routes_exports, {
-  default: () => IndexPage,
-  loader: () => loader6,
-  meta: () => meta3
+  default: () => Index
 });
 init_react();
-var import_cloudflare4 = __toESM(require_cloudflare());
-
-// app/models/frontpage.server.js
-init_react();
-
-// app/models/query-partials/query-primaryMenu.js
-init_react();
-var primaryMenu = `
-  menu(id: "primary", idType: NAME) {
-    menuItems(first: 100) {
-      nodes {
-        id
-        parentId
-        label
-        path
-        target
-      }
-    }
-  }
-`;
-var query_primaryMenu_default = primaryMenu;
-
-// app/models/frontpage.server.js
-var query3 = `
-  query frontpageWithMenu {
-    ${query_primaryMenu_default}
-    pageBy(uri: "/") {
-      ${query_page_default}
-    }
-  }
-`;
-async function getFrontPage() {
-  const { data } = await createNewClient(query3);
-  if (!data.pageBy)
-    error404();
-  return data;
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/index.jsx
-var meta3 = ({ data }) => {
-  return Seo(data);
-};
-var loader6 = async () => {
-  const { menu, pageBy } = await getFrontPage();
-  console.log(pageBy);
-  return (0, import_cloudflare4.json)({ page: pageBy, menu });
-};
-function IndexPage() {
-  let data = useLoaderData();
-  return /* @__PURE__ */ React.createElement(Page, {
-    data
-  });
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/$.jsx
-var __exports = {};
-__export(__exports, {
-  default: () => Page2,
-  loader: () => loader7,
-  meta: () => meta4
-});
-init_react();
-var import_cloudflare5 = __toESM(require_cloudflare());
-
-// app/models/page.server.js
-init_react();
-var query4 = `
-  query PAGE($path: ID!) {
-    ${query_primaryMenu_default}
-    page(idType: URI, id: $path) {
-      ${query_page_default}
-    }
-  }
-`;
-async function getPage(path) {
-  const data = await createNewClient(query4, { path });
-  if (!data.page)
-    error404();
-  return data;
-}
-
-// route:/Users/s.richards/Documents/GitHub/remix-test/app/routes/$.jsx
-var meta4 = ({ data }) => {
-  return Seo(data);
-};
-var loader7 = async ({ params }) => {
-  const { menu, page } = await getPage(params["*"]);
-  return (0, import_cloudflare5.json)({ page, menu });
-};
-function Page2() {
-  const data = useLoaderData();
-  return /* @__PURE__ */ React.createElement(Page, {
-    data
-  });
+function Index() {
+  return /* @__PURE__ */ React.createElement("div", {
+    style: { fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }
+  }, /* @__PURE__ */ React.createElement("h1", null, "Welcome to Remix"), /* @__PURE__ */ React.createElement("ul", null, /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("a", {
+    target: "_blank",
+    href: "https://remix.run/tutorials/blog",
+    rel: "noreferrer"
+  }, "15m Quickstart Blog Tutorial")), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("a", {
+    target: "_blank",
+    href: "https://remix.run/tutorials/jokes",
+    rel: "noreferrer"
+  }, "Deep Dive Jokes App Tutorial")), /* @__PURE__ */ React.createElement("li", null, /* @__PURE__ */ React.createElement("a", {
+    target: "_blank",
+    href: "https://remix.run/docs",
+    rel: "noreferrer"
+  }, "Remix Docs"))));
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
 init_react();
-var assets_manifest_default = { "version": "e0859e62", "entry": { "module": "/build/entry.client-R2HCPLDE.js", "imports": ["/build/_shared/chunk-QLI7F7RF.js", "/build/_shared/chunk-XV23MX66.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-2SKRO4Q5.js", "imports": ["/build/_shared/chunk-P652U4IZ.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/$": { "id": "routes/$", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/$-4MXCZA7L.js", "imports": ["/build/_shared/chunk-IVULTTIO.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/index": { "id": "routes/index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/index-CFJQBCUY.js", "imports": ["/build/_shared/chunk-IVULTTIO.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/preview": { "id": "routes/preview", "parentId": "root", "path": "preview", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/preview-H2M46ULM.js", "imports": ["/build/_shared/chunk-IVULTTIO.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/robots[.txt]": { "id": "routes/robots[.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/robots[.txt]-BJDKHAIU.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/site[.webmanifest]": { "id": "routes/site[.webmanifest]", "parentId": "root", "path": "site.webmanifest", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/site[.webmanifest]-5GR4WHJ3.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/sitemap[.xml]": { "id": "routes/sitemap[.xml]", "parentId": "root", "path": "sitemap.xml", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/sitemap[.xml]-OM3V5HVX.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-E0859E62.js" };
+var assets_manifest_default = { "version": "d0799833", "entry": { "module": "/build/entry.client-YBBAML5P.js", "imports": ["/build/_shared/chunk-U6DJXQCE.js", "/build/_shared/chunk-IYRIQ6PI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-G5RSNUVA.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/index": { "id": "routes/index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/index-M4OGUJKJ.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-D0799833.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };
@@ -16530,38 +14090,6 @@ var routes = {
     caseSensitive: void 0,
     module: root_exports
   },
-  "routes/site[.webmanifest]": {
-    id: "routes/site[.webmanifest]",
-    parentId: "root",
-    path: "site.webmanifest",
-    index: void 0,
-    caseSensitive: void 0,
-    module: site_webmanifest_exports
-  },
-  "routes/sitemap[.xml]": {
-    id: "routes/sitemap[.xml]",
-    parentId: "root",
-    path: "sitemap.xml",
-    index: void 0,
-    caseSensitive: void 0,
-    module: sitemap_xml_exports
-  },
-  "routes/robots[.txt]": {
-    id: "routes/robots[.txt]",
-    parentId: "root",
-    path: "robots.txt",
-    index: void 0,
-    caseSensitive: void 0,
-    module: robots_txt_exports
-  },
-  "routes/preview": {
-    id: "routes/preview",
-    parentId: "root",
-    path: "preview",
-    index: void 0,
-    caseSensitive: void 0,
-    module: preview_exports
-  },
   "routes/index": {
     id: "routes/index",
     parentId: "root",
@@ -16569,14 +14097,6 @@ var routes = {
     index: true,
     caseSensitive: void 0,
     module: routes_exports
-  },
-  "routes/$": {
-    id: "routes/$",
-    parentId: "root",
-    path: "*",
-    index: void 0,
-    caseSensitive: void 0,
-    module: __exports
   }
 };
 
@@ -16608,24 +14128,6 @@ object-assign
  * Copyright(c) 2012-2014 Roman Shtylman
  * Copyright(c) 2015 Douglas Christopher Wilson
  * MIT Licensed
- */
-/**
- * @file postscribe
- * @description Asynchronously write javascript, even with document.write.
- * @version v2.0.8
- * @see {@link https://krux.github.io/postscribe}
- * @license MIT
- * @author Derek Brans
- * @copyright 2016 Krux Digital, Inc
- */
-/**
- * @file prescribe
- * @description Tiny, forgiving HTML parser
- * @version vundefined
- * @see {@link https://github.com/krux/prescribe/}
- * @license MIT
- * @author Derek Brans
- * @copyright 2016 Krux Digital, Inc
  */
 /**
  * @remix-run/cloudflare v1.4.1
@@ -16686,14 +14188,6 @@ object-assign
  * LICENSE.md file in the root directory of this source tree.
  *
  * @license MIT
- */
-/** @license React v16.13.1
- * react-is.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
  */
 /** @license React v17.0.2
  * react-dom-server.node.development.js

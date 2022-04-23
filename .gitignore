@@ -1,10 +1,9 @@
 .vscode/
 .DS_Store
-node_modules/
+
+node_modules
 
 /.cache
-/build
-/server-build
+/functions/\[\[path\]\].js
 /public/build
-
 .env

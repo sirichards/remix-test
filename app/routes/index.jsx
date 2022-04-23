@@ -1,23 +1,32 @@
-import { json } from "@remix-run/cloudflare"
-import { useLoaderData } from "@remix-run/react"
-import { getFrontPage } from "~/models/frontpage.server"
-import { Seo } from "~/utils/seo"
-import PageTemplate from "~/components/templates/PageTemplate"
-
-export const meta = ({data}) => {
-  return Seo(data)
-}
-
-// Get front page data
-export let loader = async () => {
-  const { menu, pageBy } = await getFrontPage()
-
-  console.log(pageBy)
-
-  return json({page: pageBy, menu})
-}
-
-export default function IndexPage() {
-  let data = useLoaderData()
-  return <PageTemplate data={data} />
+export default function Index() {
+  return (
+    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
+      <h1>Welcome to Remix</h1>
+      <ul>
+        <li>
+          <a
+            target="_blank"
+            href="https://remix.run/tutorials/blog"
+            rel="noreferrer"
+          >
+            15m Quickstart Blog Tutorial
+          </a>
+        </li>
+        <li>
+          <a
+            target="_blank"
+            href="https://remix.run/tutorials/jokes"
+            rel="noreferrer"
+          >
+            Deep Dive Jokes App Tutorial
+          </a>
+        </li>
+        <li>
+          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
+            Remix Docs
+          </a>
+        </li>
+      </ul>
+    </div>
+  );
 }
