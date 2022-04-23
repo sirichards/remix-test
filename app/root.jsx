@@ -1,4 +1,3 @@
-import { json } from "@remix-run/cloudflare"
 import {
   Links,
   LiveReload,
@@ -15,15 +14,6 @@ export const meta = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export let loader = async ({env}) => {
-  console.log(env)
-  return json({
-    ENV: {
-      env: env,
-    },
-  });
-}
-
 export default function App() {
   const data = useLoaderData();
   return (
@@ -35,13 +25,6 @@ export default function App() {
       <body>
         <Outlet />
         <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(
-              data.ENV
-            )}`,
-          }}
-        />
         <Scripts />
         <LiveReload />
       </body>
