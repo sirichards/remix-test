@@ -14,7 +14,7 @@ export const meta = () => ({
 });
 
 export let loader = async ({env}) => {
-  console.log(env.WORDPRESS_API_URL)
+  console.log(env)
   return {}
 }
 
