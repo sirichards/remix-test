@@ -39,7 +39,7 @@ export default function App() {
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(
               data.ENV
-            )} console.log(${data.ENV})`,
+            )}`,
           }}
         />
         <Scripts />
