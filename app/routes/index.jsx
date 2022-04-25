@@ -7,7 +7,7 @@ import PageTemplate from "~/components/templates/PageTemplate"
 // Get front page data
 export let loader = async () => {
   const { menu, pageBy } = await getFrontPage()
-
+  console.log(WORDPRESS_API_URL)
   return json({page: pageBy, menu})
 }
 

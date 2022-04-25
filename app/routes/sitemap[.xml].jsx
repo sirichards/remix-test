@@ -6,7 +6,7 @@ export async function loader() {
   function getEntry(node) {
     return `
     <url>
-      <loc>${process.env.FRONTEND_URL}${node.uri}</loc>
+      <loc>https://domain.com/${node.uri}</loc>
       <lastmod>${node.modified}</lastmod>
       <changefreq>daily</changefreq>
       <priority>${node.uri === "/" ? "1.0" : "0.7"}</priority>

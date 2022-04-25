@@ -6,7 +6,7 @@ import PageTemplate from "~/components/templates/PageTemplate"
 
 export const meta = ({data}) => {
   return Seo(data)
-};
+}
 
 // Get page by path
 export const loader = async ({request}) => {

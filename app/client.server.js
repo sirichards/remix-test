@@ -1,15 +1,15 @@
-export async function createNewClient(query, auth=false) {
+export async function createNewClient(query, variables, auth=false) {
   let wpAuthorization
-  if (auth) {
-    // Define env vars.
-    const wpAppUser = "admin"
-    const wpAppPass = "wB0M iSID LQIs WFKl uPEo 0mX6"
+  // if (auth) {
+  //   // needs to be ENV var
+  //   const wpAppUser = "admin"
+  //   const wpAppPass = ""
 
-    // Set WP application password auth header.
-    wpAuthorization = Buffer.from(`${wpAppUser}:${wpAppPass}`).toString(
-      'base64'
-    )
-  }
+  //   // Set WP application password auth header.
+  //   wpAuthorization = Buffer.from(`${wpAppUser}:${wpAppPass}`).toString(
+  //     'base64'
+  //   )
+  // }
 
   const endpoint = "https://cms.dewynters-aws.co.uk/graphql"
 
@@ -20,7 +20,8 @@ export async function createNewClient(query, auth=false) {
       authorization: auth ? `Basic ${wpAuthorization}` : ''
     },
     body: JSON.stringify({
-      query: query
+      query: query,
+      variables: variables
     }),
   })
   .then((res) => res.json())

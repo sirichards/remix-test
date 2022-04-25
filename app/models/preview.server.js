@@ -1,10 +1,8 @@
-import { json } from "@remix-run/cloudflare"
-import { gql } from "graphql-request"
 import { error404, error401 } from "~/utils/helpers"
 import { createNewClient } from "~/client.server"
 import defaultPageFields from "./query-partials/query-page"
 
-const query = gql`
+const query = `
   query PAGE($pageId: ID!) {
     page(idType: DATABASE_ID, id: $pageId, asPreview: true) {
       ${defaultPageFields}
@@ -13,7 +11,7 @@ const query = gql`
 `
 
 export async function getPreviewPage(pageId, secret) {
-  if (!pageId || !process.env.WORDPRESS_PREVIEW_SECRET || secret !== process.env.WORDPRESS_PREVIEW_SECRET) {
+  if (!pageId || secret !== 'dewynters') { // needs to be ENV var
     error401()
   }
 
