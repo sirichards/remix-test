@@ -1,4 +1,4 @@
-export async function createNewClient(query, variables, auth=false) {
+export async function createNewClient(query, variables={}, auth=false) {
   let wpAuthorization
   // if (auth) {
   //   // needs to be ENV var

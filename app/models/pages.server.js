@@ -15,7 +15,7 @@ const query = `
 `
 
 export async function getPages() {
-  const pages = await createNewClient(query)
+  const { data } = await createNewClient(query)
 
-  return pages
+  return data
 }

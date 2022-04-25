@@ -1,12 +1,12 @@
 import { getPages } from "~/models/pages.server"
 
-export async function loader() {
+export async function loader({context}) {
   const { pages } = await getPages()
 
   function getEntry(node) {
     return `
     <url>
-      <loc>https://domain.com/${node.uri}</loc>
+      <loc>${context.env.FRONTEND_URL}${node.uri}</loc>
       <lastmod>${node.modified}</lastmod>
       <changefreq>daily</changefreq>
       <priority>${node.uri === "/" ? "1.0" : "0.7"}</priority>
