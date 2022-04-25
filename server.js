@@ -10,6 +10,7 @@ import * as build from "@remix-run/dev/server-build";
 const handleRequest = createPagesFunctionHandler({
   build,
   getLoadContext: ({ env }) => {
+    env.NODE_ENV = process.env.NODE_ENV
     return { env }
   },
 })

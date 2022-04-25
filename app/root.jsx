@@ -16,10 +16,11 @@ export const meta = () => ({
 });
 
 export let loader = async ({context}) => {
+
+  // WARNING: dont expose any secret envs
   return json({
     ENV: {
-      env: context.env,
-      WORDPRESS_API_URL: context.env.WORDPRESS_API_URL,
+      NODE_ENV: context.env.NODE_ENV
     },
   });
 }
@@ -44,7 +45,7 @@ export default function App() {
           }}
         />
         <Scripts />
-        <LiveReload />
+        {data.ENV.NODE_ENV === "development" && <LiveReload />}
       </body>
     </html>
   );
