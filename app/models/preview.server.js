@@ -1,9 +1,11 @@
 import { error404, error401 } from "~/utils/helpers"
 import { createNewClient } from "~/client.server"
 import defaultPageFields from "./query-partials/query-page"
+import primaryMenu from "./query-partials/query-primaryMenu"
 
 const query = `
   query page($pageId: ID!) {
+    ${primaryMenu}
     page(idType: DATABASE_ID, id: $pageId, asPreview: true) {
       ${defaultPageFields}
     }
