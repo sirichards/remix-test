@@ -10,6 +10,7 @@ import {
 } from "@remix-run/react";
 import { addTrailingSlash } from "~/utils/helpers"
 import defaults from "./config.json"
+import { useEffect } from "react"
 
 export const meta = () => ({
   charset: "utf-8",
@@ -66,7 +67,7 @@ export default function App() {
 
   useEffect(() => {
     // inject GTM
-    if (defaults.GTM_ID) {
+    if (defaults.GTM_ID && data.ENV.NODE_ENV === "production") {
       const postscribe = require('postscribe');
       postscribe(document.head, `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -84,7 +85,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        {defaults.GTM_ID && (
+        {(defaults.GTM_ID && data.ENV.NODE_ENV === "production") && (
           <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${defaults.GTM_ID}`}
           height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe></noscript>
         )}
