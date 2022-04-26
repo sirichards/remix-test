@@ -4,9 +4,15 @@ import { getPreviewPage } from "~/models/preview.server"
 import { Seo } from "~/utils/seo"
 import PageTemplate from "~/components/templates/PageTemplate"
 
-// export const meta = ({data}) => {
-//   return Seo(data)
-// }
+/**
+ * 
+ * @param {object} data data from loader with seo fields 
+ * @returns 
+ */
+export const meta = ({data}) => {
+  const noindex = true
+  return Seo(data, noindex)
+}
 
 /**
  * Get page by path
@@ -20,8 +26,8 @@ export const loader = async ({request, context}) => {
   const pageId = url.searchParams.get("page_id")
   const secret = url.searchParams.get("secret")
 
-  const { page } = await getPreviewPage(context, pageId, secret)
-  return json({page})
+  const { menu, page } = await getPreviewPage(context, pageId, secret)
+  return json({menu, page})
 }
 
 export default function Preview() {

@@ -1,6 +1,6 @@
 import defaults from "~/config.json"
 
-export function Seo(data) {
+export function Seo(data, noindex=false) {
   const {
     title, 
     metaDesc,
@@ -27,5 +27,6 @@ export function Seo(data) {
     "twitter:creator": "Dewynters",
     "twitter:title": metaTitle,
     "twitter:description": metaDescription,
+    "robots": noindex ? "noindex" : "index, follow"
   };
 }

@@ -5,6 +5,15 @@ import { Seo } from "~/utils/seo"
 import PageTemplate from "~/components/templates/PageTemplate"
 
 /**
+ * 
+ * @param {object} data data from loader with seo fields 
+ * @returns 
+ */
+export const meta = ({data}) => {
+  return Seo(data)
+}
+
+/**
  * Get frontpage data
  * 
  * @param {obect} context   Contains env variables required for graphql query
@@ -13,10 +22,6 @@ import PageTemplate from "~/components/templates/PageTemplate"
 export let loader = async ({context}) => {
   const { menu, pageBy } = await getFrontPage(context)
   return json({page: pageBy, menu})
-}
-
-export const meta = ({data}) => {
-  return Seo(data)
 }
 
 export default function IndexPage() {
