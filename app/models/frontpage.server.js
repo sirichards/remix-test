@@ -12,9 +12,15 @@ const query = `
   }
 `
 
-export async function getFrontPage() {
+/**
+ * Get frontpage data
+ * 
+ * @param {object} context   Contains env variables required for graphql query
+ * @returns {object}         Contains frontpage data
+ */
+export async function getFrontPage(context) {
   // get frontpage data + menus
-  const { data } = await createNewClient(query)
+  const { data } = await createNewClient(context, query)
 
   // front page not found
   if (!data.pageBy) error404()

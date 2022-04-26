@@ -1,19 +1,25 @@
-export async function createNewClient(query, variables={}, auth=false) {
+/**
+ * Query WP graphql endpoint
+ * 
+ * @param {object} context    Contains env variables required for graphql query, endpoint and username/password if required
+ * @param {object} query      Graphql query
+ * @param {object} variables  Grapqhl variables
+ * @param {boolean} auth 
+ * @returns {object}          Contains object result
+ */
+export async function createNewClient(context, query, variables={}, auth=false) {
   let wpAuthorization
-  // if (auth) {
-  //   // needs to be ENV var
-  //   const wpAppUser = "admin"
-  //   const wpAppPass = ""
+  const username = context.env.WORDPRESS_APPLICATION_USERNAME
+  const password = context.env.WORDPRESS_APPLICATION_PASSWORD
+  if (auth && username && password) {
+    // Set WP application password auth header.
+    // wpAuthorization = Buffer.from(`${username}:${password}`).toString(
+    //   'base64'
+    // )
+    wpAuthorization = btoa(`${username}:${password}`)
+  }
 
-  //   // Set WP application password auth header.
-  //   wpAuthorization = Buffer.from(`${wpAppUser}:${wpAppPass}`).toString(
-  //     'base64'
-  //   )
-  // }
-
-  const endpoint = "https://cms.dewynters-aws.co.uk/graphql"
-
-  const req = await fetch(endpoint, {
+  const req = await fetch(context.env.WORDPRESS_API_URL, {
     method: "POST",
     headers: {
       'Content-Type': "application/json",

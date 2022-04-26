@@ -1,3 +1,5 @@
+import { redirect } from "@remix-run/cloudflare";
+
 export function error404() {
   throw new Response("Not Found", {
     status: 404,
@@ -8,6 +10,24 @@ export function error401() {
   throw new Response("Unauthorized", {
     status: 401,
   });
+}
+
+/**
+ * Add trailing slash if missing, isn't a file or query url
+ * 
+ * @param {object} url Current url
+ */
+export function addTrailingSlash(url) {
+  if (
+    url.pathname !== "/" &&
+    !url.pathname.endsWith("/") &&
+    !url.pathname.includes(".") &&
+    !url.href.includes("?")
+  ) {
+    throw redirect(`${url.pathname}/`, {
+      status: 308,
+    });
+  }
 }
 
 /**

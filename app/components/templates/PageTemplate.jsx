@@ -5,7 +5,7 @@ export default function Page({data}) {
   const { menu, page } = data
   return(
     <Layout menu={menu}>
-      <h1 className="text-4xl py-4">Page title</h1>
+      <h1 className="text-4xl py-4">Page title: { page.title }</h1>
       <FlexibleContent blocks={page.acfFlexibleContent?.blocks} />
     </Layout>
   )

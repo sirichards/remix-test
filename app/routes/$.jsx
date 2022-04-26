@@ -8,9 +8,15 @@ export const meta = ({data}) => {
   return Seo(data)
 }
 
-// Get page by path
-export const loader = async ({params}) => {
-  const { menu, page } = await getPage(params["*"])
+/**
+ * Get page by path
+ * 
+ * @param {object} context  Contains env variables required for graphql query
+ * @param {array} params    Page params
+ * @returns {object}        Contains page data
+ */
+export const loader = async ({context, params}) => {
+  const { menu, page } = await getPage(context, params["*"])
 
   return json({page, menu})
 }

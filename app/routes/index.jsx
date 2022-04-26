@@ -4,9 +4,14 @@ import { getFrontPage } from "~/models/frontpage.server"
 import { Seo } from "~/utils/seo"
 import PageTemplate from "~/components/templates/PageTemplate"
 
-// Get front page data
-export let loader = async () => {
-  const { menu, pageBy } = await getFrontPage()
+/**
+ * Get frontpage data
+ * 
+ * @param {obect} context   Contains env variables required for graphql query
+ * @returns {object}        Contains frontpage data
+ */
+export let loader = async ({context}) => {
+  const { menu, pageBy } = await getFrontPage(context)
   return json({page: pageBy, menu})
 }
 

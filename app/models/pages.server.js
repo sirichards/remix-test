@@ -14,8 +14,13 @@ const query = `
   }
 `
 
-export async function getPages() {
-  const { data } = await createNewClient(query)
+/**
+ * 
+ * @param {object} context Contains env variables required for graphql query
+ * @returns pages data
+ */
+export async function getPages(context) {
+  const { data } = await createNewClient(context, query)
 
   return data
 }

@@ -12,9 +12,16 @@ const query = `
   }
 `
 
-export async function getPage(path) {
+/**
+ * Get page data by uri
+ * 
+ * @param {object} context   Contains env variables required for graphql query
+ * @param {string} path      Contains page uri
+ * @returns {object}         Page data
+ */
+export async function getPage(context, path) {
   // query page by path/uri  + menus
-  const { data } = await createNewClient(query, { path })
+  const { data } = await createNewClient(context, query, { path })
 
   // page not found
   if (!data.page) error404()
