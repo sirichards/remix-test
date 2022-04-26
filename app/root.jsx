@@ -8,9 +8,10 @@ import {
   ScrollRestoration,
   useLoaderData
 } from "@remix-run/react";
+import { useEffect } from "react"
 import { addTrailingSlash } from "~/utils/helpers"
 import defaults from "./config.json"
-import { useEffect } from "react"
+import tailwindCss from "./styles/tailwind.css"
 
 export const meta = () => ({
   charset: "utf-8",
@@ -44,7 +45,7 @@ export const links = () => [
   { rel: 'manifest', href: '/site.webmanifest' },
   { rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#000000' },
   { rel: 'icon', href: '/favicon.ico' },
-  // { rel: "stylesheet", href: tailwindStyles },
+  { rel: "stylesheet", href: tailwindCss },
   { rel: 'sitemap', href: '/sitemap.xml', type: 'application/xml' },
 ]
 

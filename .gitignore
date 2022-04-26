@@ -8,3 +8,14 @@ node_modules
 /functions/\[\[path\]\].js.map
 /public/build
 .env
+
+
+#blacklist wordpress
+wp/*
+
+#whitelist wordpress
+!wp/wp-content/
+#re-ignore uploads
+wp/wp-content/uploads
+#re-ignore wpress backups
+wp/wp-content/ai1wm-backups
